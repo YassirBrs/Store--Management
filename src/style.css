@@ -1,12 +1,13 @@
-.gestion_label{
-    -fx-text-fill: white;
-    -fx-font-size : 30px;
-    -fx-padding: 40px;
-}
+/*.gestion_label{*/
+/*    -fx-text-fill: white;*/
+/*    -fx-font-size : 30px;*/
+/*    -fx-padding: 40px;*/
+/*}*/
 
 .app_title{
     -fx-text-fill: #000;
     -fx-font-size : 40px;
+    -fx-padding: 40px;
 }
 
 .buttons{

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.function.Predicate;
 
 import UI.FormValidator;
+import UI.Header;
 import UI.Navbar;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
@@ -22,16 +23,13 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
 public class IHM extends Application {
 
     BorderPane root = new BorderPane();
-    Scene scene = new Scene(root, 1300, 900);
+    Scene scene = new Scene(root, 1300, 800);
 
     private VBox boxTop;
     private HBox bottom;
@@ -39,7 +37,6 @@ public class IHM extends Application {
     private GridPane centerPane;
     private VBox rightBox;
     private TextField searchTextField;
-    Label gestionLabel;
     Label idLabel;
     Label desLabel;
     Label prixLabel;
@@ -88,7 +85,6 @@ public class IHM extends Application {
 
         this.categoryLabel = new Label("Catégorie");
         this.statusLabel = new Label();
-        this.gestionLabel = new Label("Gestion de Magasin");
         this.idTextField = new TextField();
         this.desTextField = new TextField();
         this.prixTextField = new TextField();
@@ -98,7 +94,8 @@ public class IHM extends Application {
         this.desLabel = new Label("Designation");
         this.prixLabel = new Label("Prix");
         idTextField.setDisable(true);
-        boxTop.getChildren().addAll(gestionLabel, (new Navbar(window, "product")).getHeader());
+        Pane header= Header.initt();
+        boxTop.getChildren().addAll(header, (new Navbar(window, "product")).getHeader());
         boxTop.setAlignment(Pos.CENTER);
 
         leftBox.getChildren().addAll(addButton, editButton, deleteButton);
@@ -119,7 +116,6 @@ public class IHM extends Application {
 
         centerPane.setPadding(new Insets(10));
 
-        gestionLabel.getStyleClass().add("gestion_label");
 
         idLabel.getStyleClass().add("labels");
         desLabel.getStyleClass().add("labels");

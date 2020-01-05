@@ -36,7 +36,6 @@ public class IHM extends Application {
     private GridPane centerPane;
     private VBox rightBox;
     private TextField searchTextField;
-    Label gestionLabel;
     Label idLabel;
     Label nameLabel;
     Label descLabel;
@@ -76,7 +75,6 @@ public class IHM extends Application {
         nameColumn.setPrefWidth(170);
         descColumn.setPrefWidth(270);
         this.statusLabel = new Label();
-        this.gestionLabel = new Label("Gestion de Magasin");
         this.idTextField = new TextField();
         this.descTextField = new TextField();
         this.nameTextField = new TextField();
@@ -100,7 +98,6 @@ public class IHM extends Application {
         centerPane.add(descTextField, 1, 5);
         centerPane.setPadding(new Insets(10));
 
-        gestionLabel.getStyleClass().add("gestion_label");
 
         idLabel.getStyleClass().add("labels");
         nameLabel.getStyleClass().add("labels");

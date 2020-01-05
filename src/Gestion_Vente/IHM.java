@@ -7,6 +7,7 @@ import Gestion_Produit.ProductDAOIMPL;
 import java.util.List;
 
 import UI.FormValidator;
+import UI.Header;
 import UI.Navbar;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
@@ -19,17 +20,14 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
 
 public class IHM extends Application {
 
     BorderPane root = new BorderPane();
-    Scene scene = new Scene(root, 1300, 700);
+    Scene scene = new Scene(root, 1300, 800);
 
     private VBox boxTop;
     private HBox bottom, rightControls;
@@ -38,7 +36,6 @@ public class IHM extends Application {
     private VBox rightBox, centerBox;
     private TextField searchTextField;
     // Les labels
-    Label gestionLabel;
     Label idLabel;
     Label clientLabel;
     Label dateLabel;
@@ -124,7 +121,6 @@ public class IHM extends Application {
         totalLigneColumn = new TableColumn<>("Total");
 
         this.statusLabel = new Label();
-        this.gestionLabel = new Label("Gestion de Magasin");
         this.idTextField = new TextField();
         this.dateTextField = new TextField();
         this.dateTextField.setPromptText("jj/mm/aaaa");
@@ -136,7 +132,8 @@ public class IHM extends Application {
         this.showPaiements = new Button("Paiements");
         this.clientLabel = new Label("Client");
         this.dateLabel = new Label("Date");
-        boxTop.getChildren().addAll(gestionLabel, (new Navbar(window, "sale")).getHeader());
+        Pane header= Header.initt();
+        boxTop.getChildren().addAll(header, (new Navbar(window, "sale")).getHeader());
         boxTop.setAlignment(Pos.CENTER);
 
         leftBox.getChildren().addAll(addButton, editButton, deleteButton, showPaiements);
@@ -156,7 +153,6 @@ public class IHM extends Application {
 
         centerPane.setPadding(new Insets(10));
 
-        gestionLabel.getStyleClass().add("gestion_label");
 
         idLabel.getStyleClass().add("labels");
         clientLabel.getStyleClass().add("labels");

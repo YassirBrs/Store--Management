@@ -4,6 +4,7 @@ import Gestion_Vente.VenteDAOIMPL;
 
 import java.util.List;
 import UI.FormValidator;
+import UI.Header;
 import UI.Navbar;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
@@ -15,16 +16,13 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
 public class IHM extends Application {
 
     BorderPane root = new BorderPane();
-    Scene scene = new Scene(root, 1300, 700);
+    Scene scene = new Scene(root, 1300, 800);
 
     private VBox boxTop;
     private HBox bottom;
@@ -124,7 +122,8 @@ public class IHM extends Application {
         payerCombobox.setItems(payerList);
         typesBox.setItems(typeList);
         payerCombobox.getSelectionModel().select(1);
-        boxTop.getChildren().addAll(gestionLabel, (new Navbar(window, "payement")).getHeader());
+        Pane header= Header.initt();
+        boxTop.getChildren().addAll(header, (new Navbar(window, "payement")).getHeader());
         boxTop.setAlignment(Pos.CENTER);
 //        keyReleasedProperty();
 
@@ -408,9 +407,7 @@ public class IHM extends Application {
         return this.scene;
     }
 
-    /**
-     * @param args the command line arguments
-     */
+
     public static void main(String[] args) {
         launch(args);
     }

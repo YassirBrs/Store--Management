@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.function.Predicate;
 
 import UI.FormValidator;
+import UI.Header;
 import UI.Navbar;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
@@ -20,17 +21,14 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
 
 public class IHM extends Application {
 
     BorderPane root = new BorderPane();
-    Scene scene = new Scene(root, 1300, 700);
+    Scene scene = new Scene(root, 1300, 800);
 
     private VBox boxTop;
     private HBox bottom;
@@ -39,7 +37,6 @@ public class IHM extends Application {
     private VBox rightBox;
     private TextField searchTextField;
     // Les labels
-    Label gestionLabel;
     Label idLabel;
     Label nameLabel;
     Label lnameLabel;
@@ -91,7 +88,6 @@ public class IHM extends Application {
         telephoneColumn = new TableColumn<>("Telephone");
         cityColumn = new TableColumn<>("Ville");
         this.statusLabel = new Label();
-        this.gestionLabel = new Label("Gestion de Magasin");
         this.idTextField = new TextField();
         this.nameTextField = new TextField();
         this.lnameTextField = new TextField();
@@ -105,7 +101,8 @@ public class IHM extends Application {
         this.lnameLabel = new Label("Prenom");
         this.telephoneLabel = new Label("Telephone");
         this.cityLabel = new Label("Ville");
-        boxTop.getChildren().addAll(gestionLabel, (new Navbar(window, "client")).getHeader());
+        Pane header= Header.initt();
+        boxTop.getChildren().addAll(header, (new Navbar(window, "client")).getHeader());
         boxTop.setAlignment(Pos.CENTER);
 
 
@@ -126,7 +123,6 @@ public class IHM extends Application {
 
         centerPane.setPadding(new Insets(10));
 
-        gestionLabel.getStyleClass().add("gestion_label");
 
         idLabel.getStyleClass().add("labels");
         nameLabel.getStyleClass().add("labels");

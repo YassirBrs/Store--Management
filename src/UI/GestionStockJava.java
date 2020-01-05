@@ -11,7 +11,7 @@ import java.net.UnknownHostException;
 public class GestionStockJava extends Application {
 
     Pane root = new Pane();
-    Scene scene = new Scene(root, 1300, 700);
+    Scene scene = new Scene(root, 1300, 800);
     
     GridPane grid;
     VBox container;
@@ -22,7 +22,7 @@ public class GestionStockJava extends Application {
     public void init(){
         grid = new GridPane();
         container = new VBox();
-        title = new Label("Gestion de Magasin");
+        title = new Label("Store Management");
         category = new Button("Gestion de Catégories");
         product = new Button("Gestion de Produits");
         client = new Button("Gestion de Clients");
@@ -59,7 +59,7 @@ public class GestionStockJava extends Application {
         
         container.getStyleClass().add("center_elem");
         container.setPrefWidth(1330);
-        container.setPrefHeight(720);
+        container.setPrefHeight(820);
 //        container.setSpacing(50);
         
         container.getChildren().addAll(title, grid);
