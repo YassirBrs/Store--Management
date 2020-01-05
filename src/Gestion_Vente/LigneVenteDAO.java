@@ -4,16 +4,16 @@ import java.util.List;
 
 public interface LigneVenteDAO {
 
-    public LigneVente find(int id);
+    LigneVente find(int id);
 
-    public void create(LigneVente p);
+    void create(LigneVente p);
 
-    public void delete(LigneVente p);
+    void delete(LigneVente p);
 
-    public void update(LigneVente p);
+    void update(LigneVente p);
 
-    public List<LigneVente> findAll();
+    List<LigneVente> findAll();
 
-    public List<LigneVente> findAll(int id);
+    List<LigneVente> findAll(int id);
     
 }

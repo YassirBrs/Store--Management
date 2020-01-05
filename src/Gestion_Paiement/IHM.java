@@ -318,7 +318,7 @@ public class IHM extends Application {
         });
 
         addButton.setOnAction(e -> {
-            if (!forms.isEmptyFields(dateTextField, dateEffetTextField, montantTextField) && typesBox.getValue() != null && payerCombobox.getValue() != null) {
+            if (!FormValidator.isEmptyFields(dateTextField, dateEffetTextField, montantTextField) && typesBox.getValue() != null && payerCombobox.getValue() != null) {
                 double paid, total, montant;
                 paid = Double.parseDouble(paidValueLabel.getText());
                 total = Double.parseDouble(totalValueLabel.getText());
@@ -335,7 +335,7 @@ public class IHM extends Application {
                         );
                         dao.create(p);
                         clearFields();
-                        this.statusLabel.setText("Le paiement a été ajouté avec succès!");
+                        this.statusLabel.setText("Paiement a été ajoutée!");
                         this.statusLabel.getStyleClass().add("custom_message");
                         updateListItems();
                         initRest(paiements);
@@ -346,12 +346,12 @@ public class IHM extends Application {
                     forms.shout("Cette vente est déja réglé");
                 }
             } else {
-                forms.shout("Merci de remplir tous les champs");
+                forms.shout("Veuillez remplir tous les champs");
             }
         });
 
         editButton.setOnAction(e -> {
-            if (!forms.isEmptyFields(idTextField, dateTextField, dateEffetTextField, montantTextField) && typesBox.getValue() != null && payerCombobox.getValue() != null) {
+            if (!FormValidator.isEmptyFields(idTextField, dateTextField, dateEffetTextField, montantTextField) && typesBox.getValue() != null && payerCombobox.getValue() != null) {
                 double paid, total, montant;
                 paid = Double.parseDouble(paidValueLabel.getText());
                 total = Double.parseDouble(totalValueLabel.getText());
@@ -365,7 +365,7 @@ public class IHM extends Application {
                     p.setType(typesBox.getValue());
                     dao.update(p);
                     clearFields();
-                    this.statusLabel.setText("Le paiement est bien modifée !");
+                    this.statusLabel.setText("Paiement a été modifiée !");
                     this.statusLabel.getStyleClass().add("custom_message");
                     updateListItems();
                     initRest(paiements);
@@ -373,27 +373,27 @@ public class IHM extends Application {
                     forms.shout("Vous avez dépassé le montant total de la vente!");
                 }
             } else {
-                forms.shout("Merci de séléctionner un paiement et remplir tous les champs");
+                forms.shout("Veuillez séléctionner un paiement et remplir tous les champs");
             }
         });
 
         deleteButton.setOnAction(e -> {
-            if (!forms.isEmptyFields(idTextField)) {
+            if (!FormValidator.isEmptyFields(idTextField)) {
                 if (forms.confirm("Êtes vous sûr de supprimer ce paiement?")) {
                     Paiement p = (new PaiementDAOIMPL()).find(Integer.parseInt(idTextField.getText()));
                     dao.delete(p);
                     clearFields();
-                    this.statusLabel.setText("Le paiement est bien supprimé !");
+                    this.statusLabel.setText("Paiement a été supprimé !");
                     this.statusLabel.getStyleClass().add("custom_message");
                     updateListItems();
                     initRest(paiements);
                 }
             } else {
-                forms.shout("Merci de séléctionner un paiement à supprimer");
+                forms.shout("Veuillez séléctionner un paiement");
             }
         });
 
-        primaryStage.setTitle("Gestion des paiements");
+        primaryStage.setTitle("Store Management");
 
         scene.getStylesheets().add("style.css");
 

@@ -37,10 +37,10 @@ public class IHM extends Application {
     private VBox rightBox;
     private TextField searchTextField;
     Label idLabel;
-    Label nameLabel;
+    Label nomLabel;
     Label descLabel;
     TextField idTextField;
-    TextField nameTextField;
+    TextField nomTextField;
     TextField descTextField;
     Button addButton;
     Button editButton;
@@ -51,7 +51,7 @@ public class IHM extends Application {
     TableView<Category> table;
     // Les columns   
     TableColumn<Category, Integer> idColumn;
-    TableColumn<Category, String> nameColumn;
+    TableColumn<Category, String> nomColumn;
     TableColumn<Category, String> descColumn;
 
     ObservableList<Category> listOfCategories;
@@ -70,19 +70,19 @@ public class IHM extends Application {
 
     private void initElement(Stage window) {
         idColumn = new TableColumn<Category, Integer>("Id");
-        nameColumn = new TableColumn<Category, String>("Name");
+        nomColumn = new TableColumn<Category, String>("Nom");
         descColumn = new TableColumn<Category, String>("Description");
-        nameColumn.setPrefWidth(170);
+        nomColumn.setPrefWidth(170);
         descColumn.setPrefWidth(270);
         this.statusLabel = new Label();
         this.idTextField = new TextField();
         this.descTextField = new TextField();
-        this.nameTextField = new TextField();
+        this.nomTextField = new TextField();
         this.addButton = new Button("Ajouter");
         this.editButton = new Button("Modifier");
         this.deleteButton = new Button("Supprimer");
         this.descLabel = new Label("Description");
-        this.nameLabel = new Label("Name");
+        this.nomLabel = new Label("Nom");
         Pane header= Header.initt();
         boxTop.getChildren().addAll(header, (new Navbar(window, "category")).getHeader());
         boxTop.setAlignment(Pos.CENTER);
@@ -92,15 +92,15 @@ public class IHM extends Application {
 
         centerPane.add(idLabel, 0, 3);
         centerPane.add(idTextField, 1, 3);
-        centerPane.add(nameLabel, 0, 4);
-        centerPane.add(nameTextField, 1, 4);
+        centerPane.add(nomLabel, 0, 4);
+        centerPane.add(nomTextField, 1, 4);
         centerPane.add(descLabel, 0, 5);
         centerPane.add(descTextField, 1, 5);
         centerPane.setPadding(new Insets(10));
 
 
         idLabel.getStyleClass().add("labels");
-        nameLabel.getStyleClass().add("labels");
+        nomLabel.getStyleClass().add("labels");
         descLabel.getStyleClass().add("labels");
         idTextField.setDisable(true);
 
@@ -158,17 +158,17 @@ public class IHM extends Application {
 
     private void initTable() {
         this.idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
-        this.nameColumn.setCellValueFactory(new PropertyValueFactory<>("Name"));
+        this.nomColumn.setCellValueFactory(new PropertyValueFactory<>("Nom"));
         this.descColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
 
         this.table.setItems(listOfCategories);
-        table.getColumns().addAll(idColumn, nameColumn, descColumn);
+        table.getColumns().addAll(idColumn, nomColumn, descColumn);
     }
 
     private void clearFields() {
         this.idTextField.setText("");
         this.descTextField.setText("");
-        this.nameTextField.setText("");
+        this.nomTextField.setText("");
     }
 
     @Override
@@ -192,7 +192,7 @@ public class IHM extends Application {
                 final String lowerCaseFilter = newValue.toLowerCase();
 
                 filteredReports.setPredicate((Predicate<? super Category>) Category -> {
-                    return Category.getName().contains(newValue) || Category.getDescription().contains(newValue);
+                    return Category.getNom().contains(newValue) || Category.getDescription().contains(newValue);
                 });
             }
         });
@@ -209,55 +209,55 @@ public class IHM extends Application {
                     Category rowData = row.getItem();
                     idTextField.setText(Long.toString(rowData.getId()));
                     idTextField.setDisable(true);
-                    nameTextField.setText(rowData.getName());
+                    nomTextField.setText(rowData.getNom());
                     descTextField.setText(rowData.getDescription());
                 }
             });
             return row;
         });
         addButton.setOnAction(e -> {
-            if(! forms.isEmptyFields(nameTextField, descTextField)){
-                Category p = new Category(0, nameTextField.getText(), descTextField.getText());
-                System.out.println(p.getName());
+            if(! FormValidator.isEmptyFields(nomTextField, descTextField)){
+                Category p = new Category(0, nomTextField.getText(), descTextField.getText());
+                System.out.println(p.getNom());
                 dao.create(p);
                 clearFields();
-                this.statusLabel.setText("La catégorie est insérée avec succès !");
+                this.statusLabel.setText("Catégorie a été ajoutée !");
                 this.statusLabel.getStyleClass().add("custom_message");
                 updateListItems();
             }else{
-                forms.shout("Merci de remplir tous les champs");
+                forms.shout("Veuillez remplir tous les champs");
             }
         });
 
         editButton.setOnAction(e -> {
-            if(! forms.isEmptyFields(idTextField, nameTextField, descTextField)){
+            if(! FormValidator.isEmptyFields(idTextField, nomTextField, descTextField)){
                 Category produtResult = dao.find(Integer.parseInt(idTextField.getText()));
-                dao.update(produtResult, nameTextField.getText(), descTextField.getText());
+                dao.update(produtResult, nomTextField.getText(), descTextField.getText());
                 updateListItems();
                 clearFields();
-                this.statusLabel.setText("La catégorie est bien modifée !");
+                this.statusLabel.setText("Catégorie a été modifée !");
                 this.statusLabel.getStyleClass().add("custom_message");
             }else{
-                forms.shout("Merci de remplir tous les champs");
+                forms.shout("Veuillez remplir tous les champs");
             }
         });
 
         deleteButton.setOnAction(e -> {
-                if(! forms.isEmptyFields(idTextField)){
+                if(! FormValidator.isEmptyFields(idTextField)){
                     if(forms.confirm("Êtes vous sûr de supprimer cette catégorie?")){
                         Category rs = dao.find(Integer.parseInt(idTextField.getText()));
                         dao.delete(rs);
                         updateListItems();
                         clearFields();
-                        this.statusLabel.setText("La catégorie est bien été supprimée !");
+                        this.statusLabel.setText("Catégorie a été supprimée !");
                         this.statusLabel.getStyleClass().add("custom_message");
                     }
                 }else{
-                    forms.shout("Séléctionner une catégorie à supprimer");
+                    forms.shout("Veuillez Séléctionner une catégorie");
                 }
         });
         
-        primaryStage.setTitle("Gestion des Catégories");
+        primaryStage.setTitle("Store Management");
 
         scene.getStylesheets().add("style.css");
 

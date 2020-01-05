@@ -250,7 +250,7 @@ public class IHM extends Application {
             return row;
         });
         addButton.setOnAction(e -> {
-            if(! forms.isEmptyFields(nameTextField, lnameTextField, adressTextField, cityTextField)){
+            if(! FormValidator.isEmptyFields(nameTextField, lnameTextField, adressTextField, cityTextField)){
                 Client p = new Client(0, nameTextField.getText(), lnameTextField.getText(), adressTextField.getText(), cityTextField.getText());
                 dao.create(p);
                 clearFields();
@@ -263,7 +263,7 @@ public class IHM extends Application {
         });
 
         editButton.setOnAction(e -> {
-            if(! forms.isEmptyFields(idTextField, nameTextField, lnameTextField, adressTextField, cityTextField)){
+            if(! FormValidator.isEmptyFields(idTextField, nameTextField, lnameTextField, adressTextField, cityTextField)){
                 Client produtResult = dao.find(Integer.parseInt(idTextField.getText()));
                 dao.update(produtResult, nameTextField.getText(), lnameTextField.getText(), adressTextField.getText(), cityTextField.getText());
                 updateListItems();
@@ -277,7 +277,7 @@ public class IHM extends Application {
         });
 
         deleteButton.setOnAction(e -> {
-            if(! forms.isEmptyFields(idTextField)){
+            if(! FormValidator.isEmptyFields(idTextField)){
                 if(forms.confirm("Êtes vous sûr de supprimer ce client?")){
                     Client rs = dao.find(Integer.parseInt(idTextField.getText()));
                     dao.delete(rs);
@@ -291,7 +291,7 @@ public class IHM extends Application {
             }
         });
 
-        primaryStage.setTitle("Gestion des clients");
+        primaryStage.setTitle("Store Management");
         
         scene.getStylesheets().add("style.css");
 

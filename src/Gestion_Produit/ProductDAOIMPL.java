@@ -104,7 +104,7 @@ public class ProductDAOIMPL implements ProductDAO {
         ResultSet rs = pstm.executeQuery();
         if(rs.next()){
          
-        return new Category(rs.getInt("id") , rs.getString("name") , rs.getString("description"));   
+        return new Category(rs.getInt("id") , rs.getString("nom") , rs.getString("description"));   
         }else{
             return null;
         }
@@ -168,14 +168,14 @@ public class ProductDAOIMPL implements ProductDAO {
     public Category findCate(String key) {
              
          try{      
-            String query = "SELECT * FROM categorie WHERE name=?";
+            String query = "SELECT * FROM categorie WHERE nom=?";
             
             pstm = dc.conn.prepareStatement(query);
             pstm.setString(1, key);
             ResultSet rs =  pstm.executeQuery();
             if(!rs.next()){
              
-            Category categorie = new Category(rs.getInt("id") , rs.getString("name"), rs.getString("description"));
+            Category categorie = new Category(rs.getInt("id") , rs.getString("nom"), rs.getString("description"));
                
             return categorie;   
             }
@@ -186,11 +186,11 @@ public class ProductDAOIMPL implements ProductDAO {
         return null;
     }
         public Category getProductCategory(int id){
-            String query = "SELECT category.name FROM produit inner join category on produit.id_category = category.id WHERE produit.id=?";
+            String query = "SELECT category.nom FROM produit inner join category on produit.id_category = category.id WHERE produit.id=?";
             try{
               pstm = dc.conn.prepareStatement(query);
               ResultSet rs = pstm.executeQuery();
-              return new Category(rs.getInt("id") , rs.getString("name"),rs.getString("description"));
+              return new Category(rs.getInt("id") , rs.getString("nom"),rs.getString("description"));
             }catch(SQLException dd){
                 dd.printStackTrace();
             }

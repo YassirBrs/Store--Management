@@ -337,11 +337,11 @@ public class IHM extends Application {
                         dateTextField.getText());
                 dao.create(v);
                 clearFields();
-                this.statusLabel.setText("La vente est inséré avec succès !");
+                this.statusLabel.setText("Vente a été ajoutée !");
                 this.statusLabel.getStyleClass().add("custom_message");
                 updateListItems();
             } else {
-                alert.setContentText("Sélectionner un client et une date pour ajouter la vente");
+                alert.setContentText("Veuillez Sélectionner un client et une date pour ajouter la vente");
                 alert.showAndWait();
             }
         });
@@ -349,16 +349,16 @@ public class IHM extends Application {
         editButton.setOnAction(e -> {
             if (table.getSelectionModel().getSelectedIndex() >= 0) {
                 Vente venteToEdit = dao.find(Integer.parseInt(idTextField.getText()));
-                venteToEdit.setClient((Client) clientComboBox.getSelectionModel().getSelectedItem());
+                venteToEdit.setClient(clientComboBox.getSelectionModel().getSelectedItem());
                 venteToEdit.setDate(dateTextField.getText());
                 dao.update(venteToEdit);
                 updateListItems();
                 clearFields();
-                this.statusLabel.setText("La vente est bien modifé !");
+                this.statusLabel.setText("Vente a été modifiée !");
                 this.statusLabel.getStyleClass().add("custom_message");
                 idTextField.setDisable(false);
             } else {
-                alert.setContentText("Sélectionner une vente pour la modifier");
+                alert.setContentText("Veuillez Sélectionner une vente");
                 alert.showAndWait();
             }
         });
@@ -377,11 +377,11 @@ public class IHM extends Application {
                     }
                     refrechLigneTable(beforeSelected);
                     clearFields();
-                    this.statusLabel.setText("La vente est bien été supprimé !");
+                    this.statusLabel.setText("Vente a été supprimé !");
                     this.statusLabel.getStyleClass().add("custom_message");
                 }
             } else {
-                alert.setContentText("Sélectionner une vente pour la supprimer");
+                alert.setContentText("Veuillez Sélectionner une vente ");
                 alert.showAndWait();
             }
         });
@@ -408,7 +408,7 @@ public class IHM extends Application {
                     }
                     refrechLigneTable(idvente);
                     clearLigneFields();
-                    this.statusLabel.setText("La ligne de vente a été ajouté !");
+                    this.statusLabel.setText("Ligne de vente a été ajouté !");
                     this.statusLabel.getStyleClass().add("custom_message");
                 } else {
                     alert.setContentText("Sélectionner un produit et définir une quantité");
@@ -430,7 +430,7 @@ public class IHM extends Application {
                 daoLigne.update(lv);
                 refrechLigneTable(idvente);
                 clearLigneFields();
-                this.statusLabel.setText("La ligne de vente a été modifié !");
+                this.statusLabel.setText("Ligne de vente a été modifié !");
                 this.statusLabel.getStyleClass().add("custom_message");
             } else {
                 alert.setContentText("Veuillez séléctionner une ligne de vente");
@@ -446,7 +446,7 @@ public class IHM extends Application {
                     daoLigne.delete(lv);
                     refrechLigneTable(idvente);
                     clearLigneFields();
-                    this.statusLabel.setText("La ligne de vente a été supprimé !");
+                    this.statusLabel.setText("Ligne de vente a été supprimé !");
                     this.statusLabel.getStyleClass().add("custom_message");
                 }
             } else {
@@ -471,7 +471,7 @@ public class IHM extends Application {
             }
         });
 
-        primaryStage.setTitle("Gestion des ventes");
+        primaryStage.setTitle("Store Management");
 
         scene.getStylesheets().add("style.css");
 

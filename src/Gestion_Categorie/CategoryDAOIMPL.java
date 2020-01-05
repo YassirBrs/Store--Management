@@ -31,7 +31,7 @@ public class CategoryDAOIMPL implements CategoryDAO {
             } else {
                 Category flag;
                 do {
-                    flag = new Category(id, rs.getString("name"), rs.getString("description"));
+                    flag = new Category(id, rs.getString("nom"), rs.getString("description"));
                 } while (rs.next());
                 return flag;
             }
@@ -45,9 +45,9 @@ public class CategoryDAOIMPL implements CategoryDAO {
     @Override
     public void create(Category ca) {
         try {
-            String query = "INSERT INTO categorie (name, description) VALUES(?,?)";
+            String query = "INSERT INTO categorie (nom, description) VALUES(?,?)";
             pstm = dc.conn.prepareStatement(query);
-            pstm.setString(1, ca.getName());
+            pstm.setString(1, ca.getNom());
             pstm.setString(2, ca.getDescription());
             int rows = pstm.executeUpdate();
         } catch (SQLException e) {
@@ -68,11 +68,11 @@ public class CategoryDAOIMPL implements CategoryDAO {
     }
 
     @Override
-    public void update(Category ca, String name, String description) {
+    public void update(Category ca, String nom, String description) {
         try {
-            String query = "UPDATE categorie SET name=?,description=? WHERE id=?";
+            String query = "UPDATE categorie SET nom=?,description=? WHERE id=?";
             pstm = dc.conn.prepareStatement(query);
-            pstm.setString(1, name);
+            pstm.setString(1, nom);
             pstm.setString(2, description);
             pstm.setLong(3, ca.getId());
             pstm.executeUpdate();
@@ -90,7 +90,7 @@ public class CategoryDAOIMPL implements CategoryDAO {
             ResultSet rs;
             rs = pstm.executeQuery();
             while (rs.next()) {
-                categories.add(new Category(rs.getInt("id"), rs.getString("name"), rs.getString("description")));
+                categories.add(new Category(rs.getInt("id"), rs.getString("nom"), rs.getString("description")));
             }
             return categories;
         } catch (SQLException e) {
@@ -114,7 +114,7 @@ public class CategoryDAOIMPL implements CategoryDAO {
     @Override
     public Category findCate(String key) {
         try {
-            String url = "SELECT * FROM categorie WHERE name=?";
+            String url = "SELECT * FROM categorie WHERE nom=?";
             pstm = dc.conn.prepareStatement(url);
             pstm.setString(1, key);
             ResultSet rs = pstm.executeQuery();
@@ -123,7 +123,7 @@ public class CategoryDAOIMPL implements CategoryDAO {
             } else {
                 Category flag;
                 do {
-                    flag = new Category(rs.getInt("id"), rs.getString("name"), rs.getString("description"));
+                    flag = new Category(rs.getInt("id"), rs.getString("nom"), rs.getString("description"));
                 } while (rs.next());
                 return flag;
             }

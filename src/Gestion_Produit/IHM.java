@@ -238,45 +238,45 @@ public class IHM extends Application {
         table.setItems(sortedProducts);
 
         addButton.setOnAction(e -> {
-            if(! forms.isEmptyFields(desTextField, prixTextField) && categorieComboBox.getValue() != null){
+            if(! FormValidator.isEmptyFields(desTextField, prixTextField) && categorieComboBox.getValue() != null){
                 Product p = new Product(0, desTextField.getText(), Double.parseDouble(prixTextField.getText()), categorieComboBox.getValue());
                 dao.create(p);
                 clearFields();
-                this.statusLabel.setText("Le produit est inséré avec succès !");
+                this.statusLabel.setText("Produit a été ajouté !");
                 this.statusLabel.getStyleClass().add("custom_message");
                 updateListItems();
             }else{
-                forms.shout("Merci de remplir tous les champs");
+                forms.shout("Veuillez remplir tous les champs");
             }
         });
 
         editButton.setOnAction(e -> {
-            if(! forms.isEmptyFields(idTextField, desTextField, prixTextField) && categorieComboBox.getValue() != null){
+            if(! FormValidator.isEmptyFields(idTextField, desTextField, prixTextField) && categorieComboBox.getValue() != null){
                 Product produtResult = dao.find(Integer.parseInt(idTextField.getText()));
                 dao.update(produtResult, desTextField.getText(), Double.parseDouble(prixTextField.getText()), categorieComboBox.getValue());
                 updateListItems();
                 clearFields();
-                this.statusLabel.setText("Le produit est bien modifé !");
+                this.statusLabel.setText("Produit a été modifié !");
             }else{
-                forms.shout("Merci de séléctionner un produit et remplir tous les champs");
+                forms.shout("Veuillez séléctionner un produit et remplir tous les champs");
             }
         });
 
         deleteButton.setOnAction(e -> {
-            if(! forms.isEmptyFields(idTextField)){
+            if(! FormValidator.isEmptyFields(idTextField)){
                 if(forms.confirm("Êtes vous sûr de supprimer c produit?")){
                     Product rs = dao.find(Integer.parseInt(idTextField.getText()));
                     dao.delete(rs);
                     updateListItems();
                     clearFields();
-                    this.statusLabel.setText("Le produit est bien été supprimé !");
+                    this.statusLabel.setText("Produit a été supprimé !");
                 }
             }else{
-                forms.shout("Merci de séléctionner un produit à supprimer");
+                forms.shout("Veuillez séléctionner un produit");
             }
         });
 
-        primaryStage.setTitle("Gestion des produits");
+        primaryStage.setTitle("Store Management");
         
         scene.getStylesheets().add("style.css");
 

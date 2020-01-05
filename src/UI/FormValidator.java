@@ -28,7 +28,7 @@ public class FormValidator {
         this.setMessage(message);
         this.alert.setAlertType(Alert.AlertType.CONFIRMATION);
         Optional<ButtonType> result = this.alert.showAndWait();
-        return result.get() == ButtonType.OK ? true : false;
+        return result.get() == ButtonType.OK;
     }
 
     public void shout(String message){

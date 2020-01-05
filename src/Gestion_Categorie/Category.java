@@ -6,13 +6,13 @@ import java.util.List;
 
 public class Category {
     private int id;
-    private String name;
+    private String nom;
     private String description;
     private List<Product> produits;
     
-    public Category(int id, String name, String description) {
+    public Category(int id, String nom, String description) {
         this.id = id;
-        this.name = name;
+        this.nom = nom;
         this.description = description;
         this.produits = getProducts();
     }
@@ -34,12 +34,12 @@ public class Category {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getNom() {
+        return nom;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setNom(String nom) {
+        this.nom = nom;
     }
 
     public String getDescription() {
@@ -52,7 +52,7 @@ public class Category {
     }
     
     public String toString(){
-        return name;
+        return nom;
     }
      
 }

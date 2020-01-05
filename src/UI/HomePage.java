@@ -1,6 +1,5 @@
 package UI;
 
-import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -8,7 +7,7 @@ import javafx.stage.Stage;
 
 import java.net.UnknownHostException;
 
-public class GestionStockJava extends Application {
+public class HomePage extends javafx.application.Application {
 
     Pane root = new Pane();
     Scene scene = new Scene(root, 1300, 800);
@@ -90,7 +89,7 @@ public class GestionStockJava extends Application {
     
     @Override
     public void start(Stage window) throws Exception {
-        window.setTitle("Gestion de magazin - Menu Principale");
+        window.setTitle("Store Management");
         window.setResizable(false);
         
         init();

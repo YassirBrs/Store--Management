@@ -4,13 +4,13 @@ import java.util.*;
 
 public interface VenteDAO {
 
-    public Vente find(int id);
+    Vente find(int id);
 
-    public void create(Vente p);
+    void create(Vente p);
 
-    public void delete(Vente p);
+    void delete(Vente p);
 
-    public void update(Vente p);
+    void update(Vente p);
 
-    public List<Vente> findAll();
+    List<Vente> findAll();
 }
