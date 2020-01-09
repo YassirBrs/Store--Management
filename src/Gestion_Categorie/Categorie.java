@@ -1,27 +1,27 @@
 package Gestion_Categorie;
 
-import Gestion_Produit.Product;
+import Gestion_Produit.Produit;
 
 import java.util.List;
 
-public class Category {
+public class Categorie {
     private int id;
     private String nom;
     private String description;
-    private List<Product> produits;
+    private List<Produit> produits;
     
-    public Category(int id, String nom, String description) {
+    public Categorie(int id, String nom, String description) {
         this.id = id;
         this.nom = nom;
         this.description = description;
         this.produits = getProducts();
     }
     
-    public List<Product> getProducts(){
+    public List<Produit> getProducts(){
          return this.produits;
     }
     
-    public void setProduits(List<Product> produits){
+    public void setProduits(List<Produit> produits){
         this.produits = produits;
     }
     

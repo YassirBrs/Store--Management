@@ -1,18 +1,18 @@
 package Gestion_Vente;
 
-import Gestion_Produit.Product;
+import Gestion_Produit.Produit;
 
 
 public class LigneVente {
     
     private int id;
     private Vente vente;
-    private Product produit;
+    private Produit produit;
     private int qte;
     private double subtotal;
     private double prix;
 
-    public LigneVente(int id, Vente vente, Product produit, int qte) {
+    public LigneVente(int id, Vente vente, Produit produit, int qte) {
         this.id = id;
         this.vente = vente;
         this.produit = produit;
@@ -37,11 +37,11 @@ public class LigneVente {
         this.vente = vente;
     }
 
-    public Product getProduit() {
+    public Produit getProduit() {
         return produit;
     }
 
-    public void setProduit(Product produit) {
+    public void setProduit(Produit produit) {
         this.produit = produit;
     }
 

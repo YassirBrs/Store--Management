@@ -15,5 +15,6 @@ public interface LigneVenteDAO {
     List<LigneVente> findAll();
 
     List<LigneVente> findAll(int id);
+
     
 }

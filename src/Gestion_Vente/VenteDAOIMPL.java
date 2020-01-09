@@ -3,6 +3,9 @@ package Gestion_Vente;
 import Gestion_Client.Client;
 import Gestion_Client.ClientDAOIMPL;
 import Database.DataConnection;
+import UI.Notification;
+import javafx.scene.control.Alert;
+
 import java.sql.PreparedStatement;
 import java.sql.*;
 import java.util.ArrayList;
@@ -74,7 +77,9 @@ public class VenteDAOIMPL implements VenteDAO {
             pstm.setInt(1, p.getId());
             int rows = pstm.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            Notification warning = new Notification("Ventes");
+            warning.setType(Alert.AlertType.ERROR);
+            warning.shows("Impossible de supprimer ! exist des lignes de commandes ou des paiement");
         }
     }
 

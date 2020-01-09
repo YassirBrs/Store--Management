@@ -6,12 +6,12 @@ import javafx.scene.control.TextField;
 
 import java.util.Optional;
 
-public class FormValidator {
+public class Notification {
     private String message;
     private Alert.AlertType type;
     Alert alert;
 
-    public FormValidator(String str) {
+    public Notification(String str) {
         this.alert = new Alert(Alert.AlertType.INFORMATION);
         this.alert.setTitle("Error Message" );
         this.alert.setHeaderText(null);
@@ -31,8 +31,8 @@ public class FormValidator {
         return result.get() == ButtonType.OK;
     }
 
-    public void shout(String message){
-        this.alert.setAlertType(Alert.AlertType.INFORMATION);
+    public void shows(String message){
+        this.alert.setAlertType(type);
         this.message = message;
         this.alert.setContentText(getMessage());
         this.alert.showAndWait();

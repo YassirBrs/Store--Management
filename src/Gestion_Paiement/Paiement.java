@@ -9,26 +9,23 @@ public class Paiement {
     private double montant;
     private String date;
     private String status;
-    private String dateEffet;
     private String type;
 
-    public Paiement(int id, Vente vente, double montant, String date, String status, String dateEffet, String type) {
+    public Paiement(int id, Vente vente, double montant, String date, String status, String type) {
         this.id = id;
         this.vente = vente;
         this.montant = montant;
         this.date = date;
         this.status = status;
-        this.dateEffet = dateEffet;
         this.type = type;
     }
 
-    public Paiement(Vente vente, double montant, String date, String status, String dateEffet, String type) {
+    public Paiement(Vente vente, double montant, String date, String status,  String type) {
         this.id = 0;
         this.vente = vente;
         this.montant = montant;
         this.date = date;
         this.status = status;
-        this.dateEffet = dateEffet;
         this.type = type;
     }
 
@@ -72,13 +69,6 @@ public class Paiement {
         this.status = status;
     }
 
-    public String getDateEffet() {
-        return dateEffet;
-    }
-
-    public void setDateEffet(String dateEffet) {
-        this.dateEffet = dateEffet;
-    }
 
     public String getType() {
         return type;
@@ -90,7 +80,7 @@ public class Paiement {
 
     @Override
     public String toString() {
-        return "Paiement{" + "id=" + id + ", vente=" + vente + ", montant=" + montant + ", date=" + date + ", propietaire=" + status + ", dateEffet=" + dateEffet + ", type=" + type + '}';
+        return "Paiement{" + "id=" + id + ", vente=" + vente + ", montant=" + montant + ", date=" + date + ", propietaire=" + status + ", type=" + type + '}';
     }
 
 }

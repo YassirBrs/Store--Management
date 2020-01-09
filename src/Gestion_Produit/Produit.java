@@ -1,23 +1,23 @@
 package Gestion_Produit;
 
-import Gestion_Categorie.Category;
+import Gestion_Categorie.Categorie;
 
-public class Product {
+public class Produit {
     private int id;
     private String designation;
     private double prix;
-    private Category catid;
+    private Categorie catid;
 
-    public Category getCatid() {
+    public Categorie getCatid() {
         return catid;
     }
 
-    public void setCatid(Category categorie) {
+    public void setCatid(Categorie categorie) {
         this.catid = categorie;
     }
     
     
-    public Product(int d , String designation , double prix, Category categorie){
+    public Produit(int d , String designation , double prix, Categorie categorie){
         this.id = d;
         this.designation = designation;
         this.prix = prix;

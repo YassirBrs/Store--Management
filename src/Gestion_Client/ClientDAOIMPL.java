@@ -1,6 +1,9 @@
 package Gestion_Client;
 
 import Database.DataConnection;
+import UI.Notification;
+import javafx.scene.control.Alert;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -61,7 +64,9 @@ try{
             pstm.setLong(1, c.getId());
              int rows = pstm.executeUpdate();
         }catch(SQLException e){
-            e.printStackTrace();
+              Notification warning = new Notification("Clients");
+              warning.setType(Alert.AlertType.ERROR);
+              warning.shows("Impossible de supprimer ! exist des Ventes");
         }
     }
 

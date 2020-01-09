@@ -52,8 +52,8 @@
     -fx-font-size:30px;
 }
 
-.custom_message{
-    -fx-text-fill: #00b508;
+.copyright{
+    -fx-text-fill: #ffffff;
     -fx-font-size: 20px;
 }
 

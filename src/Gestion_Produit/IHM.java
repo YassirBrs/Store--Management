@@ -1,10 +1,10 @@
 package Gestion_Produit;
 
-import Gestion_Categorie.Category;
+import Gestion_Categorie.Categorie;
 import java.util.List;
 import java.util.function.Predicate;
 
-import UI.FormValidator;
+import UI.Notification;
 import UI.Header;
 import UI.Navbar;
 import javafx.application.Application;
@@ -15,13 +15,7 @@ import javafx.collections.transformation.SortedList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableRow;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
@@ -40,29 +34,29 @@ public class IHM extends Application {
     Label idLabel;
     Label desLabel;
     Label prixLabel;
-    Label categoryLabel;
-    ComboBox<Category> categorieComboBox;
+    Label categorieLabel;
+    ComboBox<Categorie> categorieComboBox;
     TextField idTextField;
     TextField desTextField;
     TextField prixTextField;
     Button addButton;
     Button editButton;
     Button deleteButton;
-    ProductDAOIMPL dao;
-    ObservableList<Category> categories;
+    ProduitDAOIMPL dao;
+    ObservableList<Categorie> categories;
     Label statusLabel;
     // Attributs de la table view
-    TableView<Product> table;
+    TableView<Produit> table;
     // Les columns   
-    TableColumn<Product, Integer> idColumn;
-    TableColumn<Product, String> desColumn;
-    TableColumn<Product, Double> prixColumn;
-    TableColumn<Product, Category> categoryColumn;
+    TableColumn<Produit, Integer> idColumn;
+    TableColumn<Produit, String> desColumn;
+    TableColumn<Produit, Double> prixColumn;
+    TableColumn<Produit, Categorie> categoryColumn;
 
-    ObservableList<Product> listOfProducts;
-    List<Product> products;
+    ObservableList<Produit> listOfProduits;
+    List<Produit> produits;
 
-    FormValidator forms = new FormValidator("produits");
+    Notification forms = new Notification("produits");
 
     private void initPane() {
         this.bottom = new HBox();
@@ -75,16 +69,16 @@ public class IHM extends Application {
     }
 
     private void initElement(Stage window) {
-        idColumn = new TableColumn<Product, Integer>("Id");
-        desColumn = new TableColumn<Product, String>("Désignation");
-        prixColumn = new TableColumn<Product, Double>("Prix");
-        categoryColumn = new TableColumn<Product, Category>("Catégorie");
+        idColumn = new TableColumn<Produit, Integer>("Id");
+        desColumn = new TableColumn<Produit, String>("Désignation");
+        prixColumn = new TableColumn<Produit, Double>("Prix");
+        categoryColumn = new TableColumn<Produit, Categorie>("Catégorie");
         desColumn.setPrefWidth(130);
         prixColumn.setPrefWidth(130);
         categoryColumn.setPrefWidth(130);
 
-        this.categoryLabel = new Label("Catégorie");
-        this.statusLabel = new Label();
+        this.categorieLabel = new Label("Catégorie");
+        this.statusLabel = new Label("copyright © 2020 _ By :Yassir BOURAS");
         this.idTextField = new TextField();
         this.desTextField = new TextField();
         this.prixTextField = new TextField();
@@ -107,7 +101,7 @@ public class IHM extends Application {
         centerPane.add(desTextField, 1, 3);
         centerPane.add(prixLabel, 0, 4);
         centerPane.add(prixTextField, 1, 4);
-        centerPane.add(categoryLabel, 0, 5);
+        centerPane.add(categorieLabel, 0, 5);
         categorieComboBox = new ComboBox<>();
         categories = FXCollections.observableList(dao.getCategories());
         categorieComboBox.setItems(categories);
@@ -144,24 +138,25 @@ public class IHM extends Application {
 
         this.searchTextField.setPromptText("-----------Chercher------------");
         this.statusLabel.setAlignment(Pos.CENTER);
+        this.statusLabel.getStyleClass().add("copyright");
         this.table = new TableView<>();
 
         table.getColumns().addAll(idColumn, desColumn, prixColumn, categoryColumn);
         rightBox.getChildren().add(table);
         bottom.setAlignment(Pos.CENTER);
         bottom.getStyleClass().add("button_box");
-        this.products = dao.findAll();
-        listOfProducts = getUserList();
+        this.produits = dao.findAll();
+        listOfProduits = getUserList();
 
         root.getStyleClass().add("bg_coloring");
     }
 
-    private ObservableList<Product> getUserList() {
-        ObservableList<Product> list = FXCollections.observableArrayList();
+    private ObservableList<Produit> getUserList() {
+        ObservableList<Produit> list = FXCollections.observableArrayList();
 
-        this.products = dao.findAll();
+        this.produits = dao.findAll();
 
-        products.forEach((p) -> {
+        produits.forEach((p) -> {
             list.add(p);
         });
         return list;
@@ -169,8 +164,8 @@ public class IHM extends Application {
 
     private void updateListItems() {
 
-        listOfProducts.removeAll(listOfProducts);
-        listOfProducts.addAll(getUserList());
+        listOfProduits.removeAll(listOfProduits);
+        listOfProduits.addAll(getUserList());
 
     }
 
@@ -179,7 +174,7 @@ public class IHM extends Application {
         this.desColumn.setCellValueFactory(new PropertyValueFactory<>("designation"));
         this.prixColumn.setCellValueFactory(new PropertyValueFactory<>("prix"));
         this.categoryColumn.setCellValueFactory(new PropertyValueFactory<>("catid"));
-        this.table.setItems(listOfProducts);
+        this.table.setItems(listOfProduits);
     }
 
     private void clearFields() {
@@ -190,7 +185,7 @@ public class IHM extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        this.dao = new ProductDAOIMPL();
+        this.dao = new ProduitDAOIMPL();
         initPane();
         initElement(primaryStage);
         initTable();
@@ -202,15 +197,15 @@ public class IHM extends Application {
 
         // Récupération de la ligne courante
         table.setRowFactory(tv -> {
-            TableRow<Product> row = new TableRow<>();
+            TableRow<Produit> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 1 && (!row.isEmpty())) {
-                    Product rowData = row.getItem();
+                    Produit rowData = row.getItem();
                     idTextField.setText(Long.toString(rowData.getId()));
                     idTextField.setDisable(true);
                     desTextField.setText(rowData.getDesignation());
                     prixTextField.setText(Double.toString(rowData.getPrix()));
-                    for (Category c : categorieComboBox.getItems()) {
+                    for (Categorie c : categorieComboBox.getItems()) {
                         if (c.getId() == rowData.getCatid().getId()) {
                             categorieComboBox.getSelectionModel().select(c);
                         }
@@ -221,58 +216,57 @@ public class IHM extends Application {
         });
 
         // Mise à jour de la table après la recherche
-        FilteredList<Product> filteredReports = new FilteredList<>(listOfProducts);
+        FilteredList<Produit> filteredReports = new FilteredList<>(listOfProduits);
         searchTextField.textProperty().addListener((observavleValue, oldValue, newValue) -> {
             if (newValue == null || newValue.isEmpty()) {
                 filteredReports.setPredicate(null);
             } else {
                 final String lowerCaseFilter = newValue.toLowerCase();
 
-                filteredReports.setPredicate((Predicate<? super Product>) Product -> {
+                filteredReports.setPredicate((Predicate<? super Produit>) Product -> {
                     return Product.getDesignation().contains(newValue);
                 });
             }
         });
-        SortedList<Product> sortedProducts = new SortedList<>(filteredReports);
-        sortedProducts.comparatorProperty().bind(table.comparatorProperty());
-        table.setItems(sortedProducts);
+        SortedList<Produit> sortedProduits = new SortedList<>(filteredReports);
+        sortedProduits.comparatorProperty().bind(table.comparatorProperty());
+        table.setItems(sortedProduits);
 
         addButton.setOnAction(e -> {
-            if(! FormValidator.isEmptyFields(desTextField, prixTextField) && categorieComboBox.getValue() != null){
-                Product p = new Product(0, desTextField.getText(), Double.parseDouble(prixTextField.getText()), categorieComboBox.getValue());
+            if(! Notification.isEmptyFields(desTextField, prixTextField) && categorieComboBox.getValue() != null){
+                Produit p = new Produit(0, desTextField.getText(), Double.parseDouble(prixTextField.getText()), categorieComboBox.getValue());
                 dao.create(p);
                 clearFields();
-                this.statusLabel.setText("Produit a été ajouté !");
-                this.statusLabel.getStyleClass().add("custom_message");
                 updateListItems();
             }else{
-                forms.shout("Veuillez remplir tous les champs");
+                forms.setType(Alert.AlertType.WARNING);
+                forms.shows("Veuillez remplir tous les champs");
             }
         });
 
         editButton.setOnAction(e -> {
-            if(! FormValidator.isEmptyFields(idTextField, desTextField, prixTextField) && categorieComboBox.getValue() != null){
-                Product produtResult = dao.find(Integer.parseInt(idTextField.getText()));
+            if(! Notification.isEmptyFields(idTextField, desTextField, prixTextField) && categorieComboBox.getValue() != null){
+                Produit produtResult = dao.find(Integer.parseInt(idTextField.getText()));
                 dao.update(produtResult, desTextField.getText(), Double.parseDouble(prixTextField.getText()), categorieComboBox.getValue());
                 updateListItems();
                 clearFields();
-                this.statusLabel.setText("Produit a été modifié !");
             }else{
-                forms.shout("Veuillez séléctionner un produit et remplir tous les champs");
+                forms.setType(Alert.AlertType.WARNING);
+                forms.shows("Veuillez séléctionner un produit et remplir tous les champs");
             }
         });
 
         deleteButton.setOnAction(e -> {
-            if(! FormValidator.isEmptyFields(idTextField)){
+            if(! Notification.isEmptyFields(idTextField)){
                 if(forms.confirm("Êtes vous sûr de supprimer c produit?")){
-                    Product rs = dao.find(Integer.parseInt(idTextField.getText()));
+                    Produit rs = dao.find(Integer.parseInt(idTextField.getText()));
                     dao.delete(rs);
                     updateListItems();
                     clearFields();
-                    this.statusLabel.setText("Produit a été supprimé !");
                 }
             }else{
-                forms.shout("Veuillez séléctionner un produit");
+                forms.setType(Alert.AlertType.WARNING);
+                forms.shows("Veuillez séléctionner un produit");
             }
         });
 

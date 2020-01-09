@@ -3,7 +3,7 @@ package Gestion_Categorie;
 import java.util.List;
 import java.util.function.Predicate;
 
-import UI.FormValidator;
+import UI.Notification;
 import UI.Header;
 import UI.Navbar;
 import javafx.application.Application;
@@ -15,12 +15,7 @@ import javafx.collections.transformation.SortedList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableRow;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
@@ -45,18 +40,18 @@ public class IHM extends Application {
     Button addButton;
     Button editButton;
     Button deleteButton;
-    CategoryDAOIMPL dao;
+    CategorieDAOIMPL dao;
     Label statusLabel;
     // Attributs de la table view
-    TableView<Category> table;
+    TableView<Categorie> table;
     // Les columns   
-    TableColumn<Category, Integer> idColumn;
-    TableColumn<Category, String> nomColumn;
-    TableColumn<Category, String> descColumn;
+    TableColumn<Categorie, Integer> idColumn;
+    TableColumn<Categorie, String> nomColumn;
+    TableColumn<Categorie, String> descColumn;
 
-    ObservableList<Category> listOfCategories;
-    List<Category> categories;
-    FormValidator forms = new FormValidator("catégories");
+    ObservableList<Categorie> listOfCategories;
+    List<Categorie> categories;
+    Notification forms = new Notification("catégories");
 
     private void initPane() {
         this.bottom = new HBox();
@@ -69,12 +64,12 @@ public class IHM extends Application {
     }
 
     private void initElement(Stage window) {
-        idColumn = new TableColumn<Category, Integer>("Id");
-        nomColumn = new TableColumn<Category, String>("Nom");
-        descColumn = new TableColumn<Category, String>("Description");
+        idColumn = new TableColumn<Categorie, Integer>("Id");
+        nomColumn = new TableColumn<Categorie, String>("Nom");
+        descColumn = new TableColumn<Categorie, String>("Description");
         nomColumn.setPrefWidth(170);
         descColumn.setPrefWidth(270);
-        this.statusLabel = new Label();
+        this.statusLabel = new Label("copyright © 2020 _ By :Yassir BOURAS");
         this.idTextField = new TextField();
         this.descTextField = new TextField();
         this.nomTextField = new TextField();
@@ -128,6 +123,7 @@ public class IHM extends Application {
 
         this.searchTextField.setPromptText("-----------Chercher------------");
         this.statusLabel.setAlignment(Pos.CENTER);
+        this.statusLabel.getStyleClass().add("copyright");
         this.table = new TableView<>();
 
         rightBox.getChildren().add(table);
@@ -139,11 +135,11 @@ public class IHM extends Application {
 
     }
 
-    private ObservableList<Category> getUserList() {
-        ObservableList<Category> list = FXCollections.observableArrayList();
+    private ObservableList<Categorie> getUserList() {
+        ObservableList<Categorie> list = FXCollections.observableArrayList();
 
         this.categories = dao.findAll();
-        for (Category c : categories) {
+        for (Categorie c : categories) {
             list.add(c);
         }
         return list;
@@ -173,7 +169,7 @@ public class IHM extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        this.dao = new CategoryDAOIMPL();
+        this.dao = new CategorieDAOIMPL();
         initPane();
         initElement(primaryStage);
         initTable();
@@ -184,29 +180,29 @@ public class IHM extends Application {
         root.setBottom(bottom);
 
         // Mise à jour de la table après la recherche
-        FilteredList<Category> filteredReports = new FilteredList<>(listOfCategories);
+        FilteredList<Categorie> filteredReports = new FilteredList<>(listOfCategories);
         searchTextField.textProperty().addListener((observavleValue, oldValue, newValue) -> {
             if (newValue == null || newValue.isEmpty()) {
                 filteredReports.setPredicate(null);
             } else {
                 final String lowerCaseFilter = newValue.toLowerCase();
 
-                filteredReports.setPredicate((Predicate<? super Category>) Category -> {
+                filteredReports.setPredicate((Predicate<? super Categorie>) Category -> {
                     return Category.getNom().contains(newValue) || Category.getDescription().contains(newValue);
                 });
             }
         });
 
-        SortedList<Category> sortedProducts = new SortedList<>(filteredReports);
+        SortedList<Categorie> sortedProducts = new SortedList<>(filteredReports);
         sortedProducts.comparatorProperty().bind(table.comparatorProperty());
         table.setItems(sortedProducts);
         // Récupération de la ligne courante
 
         table.setRowFactory(tv -> {
-            TableRow<Category> row = new TableRow<>();
+            TableRow<Categorie> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 1 && (!row.isEmpty())) {
-                    Category rowData = row.getItem();
+                    Categorie rowData = row.getItem();
                     idTextField.setText(Long.toString(rowData.getId()));
                     idTextField.setDisable(true);
                     nomTextField.setText(rowData.getNom());
@@ -216,44 +212,41 @@ public class IHM extends Application {
             return row;
         });
         addButton.setOnAction(e -> {
-            if(! FormValidator.isEmptyFields(nomTextField, descTextField)){
-                Category p = new Category(0, nomTextField.getText(), descTextField.getText());
+            if(! Notification.isEmptyFields(nomTextField, descTextField)){
+                Categorie p = new Categorie(0, nomTextField.getText(), descTextField.getText());
                 System.out.println(p.getNom());
                 dao.create(p);
                 clearFields();
-                this.statusLabel.setText("Catégorie a été ajoutée !");
-                this.statusLabel.getStyleClass().add("custom_message");
                 updateListItems();
             }else{
-                forms.shout("Veuillez remplir tous les champs");
+                forms.setType(Alert.AlertType.WARNING);
+                forms.shows("Veuillez remplir tous les champs");
             }
         });
 
         editButton.setOnAction(e -> {
-            if(! FormValidator.isEmptyFields(idTextField, nomTextField, descTextField)){
-                Category produtResult = dao.find(Integer.parseInt(idTextField.getText()));
+            if(! Notification.isEmptyFields(idTextField, nomTextField, descTextField)){
+                Categorie produtResult = dao.find(Integer.parseInt(idTextField.getText()));
                 dao.update(produtResult, nomTextField.getText(), descTextField.getText());
                 updateListItems();
                 clearFields();
-                this.statusLabel.setText("Catégorie a été modifée !");
-                this.statusLabel.getStyleClass().add("custom_message");
             }else{
-                forms.shout("Veuillez remplir tous les champs");
+                forms.setType(Alert.AlertType.WARNING);
+                forms.shows("Veuillez remplir tous les champs");
             }
         });
 
         deleteButton.setOnAction(e -> {
-                if(! FormValidator.isEmptyFields(idTextField)){
+                if(! Notification.isEmptyFields(idTextField)){
                     if(forms.confirm("Êtes vous sûr de supprimer cette catégorie?")){
-                        Category rs = dao.find(Integer.parseInt(idTextField.getText()));
+                        Categorie rs = dao.find(Integer.parseInt(idTextField.getText()));
                         dao.delete(rs);
                         updateListItems();
                         clearFields();
-                        this.statusLabel.setText("Catégorie a été supprimée !");
-                        this.statusLabel.getStyleClass().add("custom_message");
                     }
                 }else{
-                    forms.shout("Veuillez Séléctionner une catégorie");
+                    forms.setType(Alert.AlertType.WARNING);
+                    forms.shows("Veuillez Séléctionner une catégorie");
                 }
         });
         

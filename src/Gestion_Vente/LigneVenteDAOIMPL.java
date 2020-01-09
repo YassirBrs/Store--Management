@@ -1,8 +1,8 @@
 package Gestion_Vente;
 
 import Database.DataConnection;
-import Gestion_Produit.Product;
-import Gestion_Produit.ProductDAOIMPL;
+import Gestion_Produit.Produit;
+import Gestion_Produit.ProduitDAOIMPL;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -14,7 +14,7 @@ public class LigneVenteDAOIMPL implements LigneVenteDAO{
     private DataConnection dc;
     PreparedStatement pstm;
     VenteDAOIMPL daoVente = new VenteDAOIMPL();
-    ProductDAOIMPL daoProduct = new ProductDAOIMPL();
+    ProduitDAOIMPL daoProduct = new ProduitDAOIMPL();
 
     public LigneVenteDAOIMPL() {
         dc = DataConnection.getConnection();
@@ -36,7 +36,7 @@ public class LigneVenteDAOIMPL implements LigneVenteDAO{
                 LigneVente flag;
                 do {
                     Vente v = daoVente.find(rs.getInt("id_vente"));
-                    Product p = daoProduct.find(rs.getInt("id_produit"));
+                    Produit p = daoProduct.find(rs.getInt("id_produit"));
                     flag = new LigneVente(id, v, p, rs.getInt("qte"));
                 } while (rs.next());
                 return flag;
@@ -103,7 +103,7 @@ public class LigneVenteDAOIMPL implements LigneVenteDAO{
             rs = pstm.executeQuery();
             LigneVente v;
             while (rs.next()) {
-                Product p = daoProduct.find(rs.getInt("id_produit"));
+                Produit p = daoProduct.find(rs.getInt("id_produit"));
                 Vente vl = daoVente.find(rs.getInt("id_vente"));
                 v = new LigneVente(rs.getInt("id"), vl, p, rs.getInt("qte"));
                 ventes.add(v);
@@ -128,7 +128,7 @@ public class LigneVenteDAOIMPL implements LigneVenteDAO{
             rs = pstm.executeQuery();
             LigneVente v;
             while (rs.next()) {
-                Product p = daoProduct.find(rs.getInt("id_produit"));
+                Produit p = daoProduct.find(rs.getInt("id_produit"));
                 Vente vl = daoVente.find(rs.getInt("id_vente"));
                 v = new LigneVente(rs.getInt("id"), vl, p, rs.getInt("qte"));
                 ventes.add(v);

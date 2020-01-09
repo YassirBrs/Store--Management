@@ -3,7 +3,7 @@ package Gestion_Client;
 import java.util.List;
 import java.util.function.Predicate;
 
-import UI.FormValidator;
+import UI.Notification;
 import UI.Header;
 import UI.Navbar;
 import javafx.application.Application;
@@ -14,12 +14,7 @@ import javafx.collections.transformation.SortedList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableRow;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
@@ -69,7 +64,7 @@ public class IHM extends Application {
     ObservableList<Client> listOfClients;
     List<Client> clients;
 
-    FormValidator forms = new FormValidator("clients");
+    Notification forms = new Notification("clients");
 
     private void initPane() {
         this.bottom = new HBox();
@@ -87,7 +82,7 @@ public class IHM extends Application {
         lnameColumn = new TableColumn<>("Prenom");
         telephoneColumn = new TableColumn<>("Telephone");
         cityColumn = new TableColumn<>("Ville");
-        this.statusLabel = new Label();
+        this.statusLabel = new Label("copyright © 2020 _ By :Yassir BOURAS");
         this.idTextField = new TextField();
         this.nameTextField = new TextField();
         this.lnameTextField = new TextField();
@@ -154,6 +149,7 @@ public class IHM extends Application {
 
         this.searchTextField.setPromptText("-----------Chercher------------");
         this.statusLabel.setAlignment(Pos.CENTER);
+        this.statusLabel.getStyleClass().add("copyright");
         this.table = new TableView<>();
 
         rightBox.getChildren().add(table);
@@ -250,44 +246,41 @@ public class IHM extends Application {
             return row;
         });
         addButton.setOnAction(e -> {
-            if(! FormValidator.isEmptyFields(nameTextField, lnameTextField, adressTextField, cityTextField)){
+            if(! Notification.isEmptyFields(nameTextField, lnameTextField, adressTextField, cityTextField)){
                 Client p = new Client(0, nameTextField.getText(), lnameTextField.getText(), adressTextField.getText(), cityTextField.getText());
                 dao.create(p);
                 clearFields();
-                this.statusLabel.setText("Client a été ajouté !");
-                this.statusLabel.getStyleClass().add("custom_message");
                 updateListItems();
             }else{
-                forms.shout("Veuillez remplir tous les champs");
+                forms.setType(Alert.AlertType.WARNING);
+                forms.shows("Veuillez remplir tous les champs");
             }
         });
 
         editButton.setOnAction(e -> {
-            if(! FormValidator.isEmptyFields(idTextField, nameTextField, lnameTextField, adressTextField, cityTextField)){
+            if(! Notification.isEmptyFields(idTextField, nameTextField, lnameTextField, adressTextField, cityTextField)){
                 Client produtResult = dao.find(Integer.parseInt(idTextField.getText()));
                 dao.update(produtResult, nameTextField.getText(), lnameTextField.getText(), adressTextField.getText(), cityTextField.getText());
                 updateListItems();
                 clearFields();
-                this.statusLabel.setText("Client a été modifié !");
-                this.statusLabel.getStyleClass().add("custom_message");
                 idTextField.setDisable(true);
             }else{
-                forms.shout("Veuillez séléctionner un client et remplir tous les champs");
+                forms.setType(Alert.AlertType.WARNING);
+                forms.shows("Veuillez séléctionner un client et remplir tous les champs");
             }
         });
 
         deleteButton.setOnAction(e -> {
-            if(! FormValidator.isEmptyFields(idTextField)){
+            if(! Notification.isEmptyFields(idTextField)){
                 if(forms.confirm("Êtes vous sûr de supprimer ce client?")){
                     Client rs = dao.find(Integer.parseInt(idTextField.getText()));
                     dao.delete(rs);
                     updateListItems();
                     clearFields();
-                    this.statusLabel.setText(" Client a été supprimé !");
-                    this.statusLabel.getStyleClass().add("custom_message");
                 }
             }else{
-                forms.shout("Veuillez Séléctionner un client ");
+                forms.setType(Alert.AlertType.WARNING);
+                forms.shows("Veuillez Séléctionner un client ");
             }
         });
 

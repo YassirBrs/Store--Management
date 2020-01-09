@@ -23,7 +23,7 @@ public class Header {
         HBox.setHgrow(box, Priority.ALWAYS);
         Text txtuser=new Text("Yassir BOURAS     ");
         txtuser.setFill(Color.WHITE);
-        txtuser.setFont(Font.font("Calibri", FontWeight.BOLD, 30));
+        txtuser.setFont(Font.font("Calibri", FontWeight.BOLD, 25));
         Image image = null;
         try {
             image = new Image(new FileInputStream("src/user.png"));

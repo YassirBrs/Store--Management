@@ -1,26 +1,29 @@
 package Gestion_Categorie;
 
 import Database.DataConnection;
-import Gestion_Produit.Product;
+import Gestion_Produit.Produit;
+import UI.Notification;
+import javafx.scene.control.Alert;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CategoryDAOIMPL implements CategoryDAO {
+public class CategorieDAOIMPL implements CategorieDAO {
 
     private DataConnection dc;
 
     PreparedStatement pstm;
 
-    public CategoryDAOIMPL() {
+    public CategorieDAOIMPL() {
         dc = DataConnection.getConnection();
 
     }
 
     @Override
-    public Category find(int id) {
+    public Categorie find(int id) {
         try {
             String url = "SELECT * FROM categorie WHERE id=?";
             pstm = dc.conn.prepareStatement(url);
@@ -29,9 +32,9 @@ public class CategoryDAOIMPL implements CategoryDAO {
             if (rs.next() == false) {
                 return null;
             } else {
-                Category flag;
+                Categorie flag;
                 do {
-                    flag = new Category(id, rs.getString("nom"), rs.getString("description"));
+                    flag = new Categorie(id, rs.getString("nom"), rs.getString("description"));
                 } while (rs.next());
                 return flag;
             }
@@ -43,7 +46,7 @@ public class CategoryDAOIMPL implements CategoryDAO {
     }
 
     @Override
-    public void create(Category ca) {
+    public void create(Categorie ca) {
         try {
             String query = "INSERT INTO categorie (nom, description) VALUES(?,?)";
             pstm = dc.conn.prepareStatement(query);
@@ -56,19 +59,21 @@ public class CategoryDAOIMPL implements CategoryDAO {
     }
 
     @Override
-    public void delete(Category ca) {
+    public void delete(Categorie ca) {
         try {
             String query = "DELETE FROM categorie WHERE id = ?";
             pstm = dc.conn.prepareStatement(query);
             pstm.setLong(1, ca.getId());
             int rows = pstm.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            Notification warning = new Notification("catégories");
+            warning.setType(Alert.AlertType.ERROR);
+            warning.shows("Impossible de supprimer ! exist des produits");
         }
     }
 
     @Override
-    public void update(Category ca, String nom, String description) {
+    public void update(Categorie ca, String nom, String description) {
         try {
             String query = "UPDATE categorie SET nom=?,description=? WHERE id=?";
             pstm = dc.conn.prepareStatement(query);
@@ -82,15 +87,15 @@ public class CategoryDAOIMPL implements CategoryDAO {
     }
 
     @Override
-    public List<Category> findAll() {
-        List<Category> categories = new ArrayList<>();
+    public List<Categorie> findAll() {
+        List<Categorie> categories = new ArrayList<>();
         try {
             String query = "SELECT * FROM categorie";
             pstm = dc.conn.prepareStatement(query);
             ResultSet rs;
             rs = pstm.executeQuery();
             while (rs.next()) {
-                categories.add(new Category(rs.getInt("id"), rs.getString("nom"), rs.getString("description")));
+                categories.add(new Categorie(rs.getInt("id"), rs.getString("nom"), rs.getString("description")));
             }
             return categories;
         } catch (SQLException e) {
@@ -99,10 +104,10 @@ public class CategoryDAOIMPL implements CategoryDAO {
         return null;
     }
 
-    public Category findProduct(int id) {
-        List<Category> res = findAll();
-        for (Category c : res) {
-            for (Product p : c.getProducts()) {
+    public Categorie findProduct(int id) {
+        List<Categorie> res = findAll();
+        for (Categorie c : res) {
+            for (Produit p : c.getProducts()) {
                 if (p.getId() == id) {
                     return c;
                 }
@@ -112,7 +117,7 @@ public class CategoryDAOIMPL implements CategoryDAO {
     }
 
     @Override
-    public Category findCate(String key) {
+    public Categorie findCate(String key) {
         try {
             String url = "SELECT * FROM categorie WHERE nom=?";
             pstm = dc.conn.prepareStatement(url);
@@ -121,9 +126,9 @@ public class CategoryDAOIMPL implements CategoryDAO {
             if (rs.next() == false) {
                 return null;
             } else {
-                Category flag;
+                Categorie flag;
                 do {
-                    flag = new Category(rs.getInt("id"), rs.getString("nom"), rs.getString("description"));
+                    flag = new Categorie(rs.getInt("id"), rs.getString("nom"), rs.getString("description"));
                 } while (rs.next());
                 return flag;
             }
