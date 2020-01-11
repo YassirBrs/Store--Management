@@ -11,6 +11,13 @@
     -fx-min-width:150px;
     /*-fx-border-insets: 15px;*/
     -fx-background-insets: 10px;
+}.imprimer{
+    -fx-background-color: #00a108;
+    -fx-text-fill:white;
+    -fx-padding: 30px;
+    -fx-min-width:150px;
+    /*-fx-border-insets: 15px;*/
+    -fx-background-insets: 10px;
 }
 .labels{
     -fx-padding: 15px;

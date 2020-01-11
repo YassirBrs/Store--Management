@@ -8,6 +8,8 @@ import UI.Notification;
 import UI.Header;
 import UI.Navbar;
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -140,6 +142,16 @@ public class IHM extends Application {
         this.statusLabel.setAlignment(Pos.CENTER);
         this.statusLabel.getStyleClass().add("copyright");
         this.table = new TableView<>();
+
+        prixTextField.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue,
+                                String newValue) {
+                if (!newValue.matches("\\d*")) {
+                    prixTextField.setText(newValue.replaceAll("[^\\d]", ""));
+                }
+            }
+        });
 
         table.getColumns().addAll(idColumn, desColumn, prixColumn, categoryColumn);
         rightBox.getChildren().add(table);

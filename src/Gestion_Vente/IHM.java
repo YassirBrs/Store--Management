@@ -64,12 +64,12 @@ public class IHM extends Application {
     TextField qteTextField;
 
 
-
     // Les buttons
     Button addButton;
     Button editButton;
     Button deleteButton;
     Button showPaiements;
+    Button imprimerFacture;
 
     Button addLigne, editLigne, deleteLigne;
 
@@ -119,6 +119,7 @@ public class IHM extends Application {
         this.addLigne = new Button("Ajouter");
         this.editLigne = new Button("Modifier");
         this.deleteLigne = new Button("Supprimer");
+        this.imprimerFacture = new Button("Imprimer Facture");
         this.alert = new Alert(Alert.AlertType.INFORMATION);
         this.alert.setHeaderText(null);
         this.alert.setTitle("Gestion magazin");
@@ -138,7 +139,7 @@ public class IHM extends Application {
 
         this.statusLabel = new Label("copyright © 2020 _ By :Yassir BOURAS");
         this.idTextField = new TextField();
-        this.timeFormatter=DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        this.timeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         this.dateTextField = new DatePicker();
         this.dateTextField.setPromptText("jj-mm-aaaa");
         this.clientComboBox = new ComboBox<>();
@@ -157,8 +158,7 @@ public class IHM extends Application {
             public void updateItem(LocalDate date, boolean empty) {
                 super.updateItem(date, empty);
                 LocalDate today = LocalDate.now();
-
-                setDisable(empty || date.compareTo(today) < 0 );
+                setDisable(empty || date.compareTo(today) < 0);
             }
         });
         qteTextField.textProperty().addListener(new ChangeListener<String>() {
@@ -193,6 +193,10 @@ public class IHM extends Application {
         editButton.getStyleClass().add("buttons");
         deleteButton.getStyleClass().add("buttons");
         showPaiements.getStyleClass().add("buttons");
+        imprimerFacture.getStyleClass().add("imprimer");
+
+        imprimerFacture.setAlignment(Pos.TOP_LEFT);
+
 
         centerPane.setVgap(10);
         centerPane.setHgap(10);
@@ -240,7 +244,7 @@ public class IHM extends Application {
 
 
         centerBox.getChildren().addAll(centerPane, searchTextField, table);
-        rightBox.getChildren().addAll(rightPane, rightControls, ligneTable);
+        rightBox.getChildren().addAll(rightPane, rightControls, ligneTable, imprimerFacture);
         root.getStyleClass().add("bg_coloring");
     }
 
@@ -362,7 +366,7 @@ public class IHM extends Application {
         });
 
         addButton.setOnAction(e -> {
-            if (clientComboBox.getValue() != null && dateTextField.getValue()!=null) {
+            if (clientComboBox.getValue() != null && dateTextField.getValue() != null) {
                 Vente v = new Vente(0,
                         clientComboBox.getSelectionModel().getSelectedItem(),
                         dateTextField.getValue().format(timeFormatter));
@@ -411,7 +415,16 @@ public class IHM extends Application {
                 alert.showAndWait();
             }
         });
-
+        imprimerFacture.setOnAction(e -> {
+            if (table.getSelectionModel().getSelectedIndex() >= 0) {
+                List<LigneVente> listVente = daoLigne.search(table.getSelectionModel().getSelectedItem().getId());
+                PDFGenerator pdfGenerator = new PDFGenerator();
+                pdfGenerator.generateBellIntoPdf(listVente, table.getSelectionModel().getSelectedItem());
+            } else {
+                alert.setContentText("Veuillez séléctionner une vente");
+                alert.showAndWait();
+            }
+        });
         addLigne.setOnAction(e -> {
             if (table.getSelectionModel().getSelectedIndex() >= 0) {
                 existLigneVente = null;
@@ -449,23 +462,23 @@ public class IHM extends Application {
             if (ligneTable.getSelectionModel().getSelectedIndex() >= 0) {
                 int idvente = ligneTable.getSelectionModel().getSelectedItem().getId();
                 LigneVente lv = daoLigne.find(idvente);
-                PaiementDAOIMPL p=new PaiementDAOIMPL();
-                int qt=Integer.parseInt(qteTextField.getText());
-                double total=table.getSelectionModel().getSelectedItem().getTotal()-ligneTable.getSelectionModel().getSelectedItem().getSubtotal();
-                double ligne=productsBox.getSelectionModel().getSelectedItem().getPrix()*qt;
-                double paiement=p.calculTotal(table.getSelectionModel().getSelectedItem().getId());
-                System.out.println("total :"+total);
-                System.out.println("new sub :"+ligne);
-                System.out.println("paiement :"+paiement);
+                PaiementDAOIMPL p = new PaiementDAOIMPL();
+                int qt = Integer.parseInt(qteTextField.getText());
+                double total = table.getSelectionModel().getSelectedItem().getTotal() - ligneTable.getSelectionModel().getSelectedItem().getSubtotal();
+                double ligne = productsBox.getSelectionModel().getSelectedItem().getPrix() * qt;
+                double paiement = p.calculTotal(table.getSelectionModel().getSelectedItem().getId());
+                System.out.println("total :" + total);
+                System.out.println("new sub :" + ligne);
+                System.out.println("paiement :" + paiement);
 
-                if (total+ligne>paiement) {
+                if (total + ligne > paiement) {
                     lv.setProduit(productsBox.getSelectionModel().getSelectedItem());
                     lv.setQte(qt);
                     daoLigne.update(lv);
                     refrechLigneTable(idvente);
                     clearLigneFields();
-                }else {
-                    Notification warning=new Notification("Modification Ligne de commande");
+                } else {
+                    Notification warning = new Notification("Modification Ligne de commande");
                     warning.setType(Alert.AlertType.ERROR);
                     warning.shows("Impossible de Modifier ! Commande deja payer");
                 }

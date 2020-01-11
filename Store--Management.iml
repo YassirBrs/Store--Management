@@ -17,5 +17,7 @@
       </library>
     </orderEntry>
     <orderEntry type="library" name="mysql-connector-java-8.0.18" level="application" />
+    <orderEntry type="library" name="itextpdf-5.4.1" level="application" />
+    <orderEntry type="library" name="xmlworker-5.4.1" level="application" />
   </component>
 </module>

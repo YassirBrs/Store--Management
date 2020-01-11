@@ -7,6 +7,8 @@ import UI.Notification;
 import UI.Header;
 import UI.Navbar;
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -42,7 +44,7 @@ public class IHM extends Application {
     TextField idTextField;
     TextField nameTextField;
     TextField lnameTextField;
-    TextField adressTextField;
+    TextField telephoneTextField;
     TextField cityTextField;
 
     // Les buttons
@@ -86,7 +88,7 @@ public class IHM extends Application {
         this.idTextField = new TextField();
         this.nameTextField = new TextField();
         this.lnameTextField = new TextField();
-        this.adressTextField = new TextField();
+        this.telephoneTextField = new TextField();
         this.cityTextField = new TextField();
 
         this.addButton = new Button("Ajouter");
@@ -112,7 +114,7 @@ public class IHM extends Application {
         centerPane.add(lnameLabel, 0, 2);
         centerPane.add(lnameTextField, 1, 2);
         centerPane.add(telephoneLabel, 0, 3);
-        centerPane.add(adressTextField, 1, 3);
+        centerPane.add(telephoneTextField, 1, 3);
         centerPane.add(cityLabel, 0, 4);
         centerPane.add(cityTextField, 1, 4);
 
@@ -151,6 +153,16 @@ public class IHM extends Application {
         this.statusLabel.setAlignment(Pos.CENTER);
         this.statusLabel.getStyleClass().add("copyright");
         this.table = new TableView<>();
+
+        telephoneTextField.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue,
+                                String newValue) {
+                if (!newValue.matches("\\d*")) {
+                    telephoneTextField.setText(newValue.replaceAll("[^\\d]", ""));
+                }
+            }
+        });
 
         rightBox.getChildren().add(table);
         bottom.setAlignment(Pos.CENTER);
@@ -196,7 +208,7 @@ public class IHM extends Application {
         this.idTextField.setText("");
         this.lnameTextField.setText("");
         this.nameTextField.setText("");
-        this.adressTextField.setText("");
+        this.telephoneTextField.setText("");
         this.cityTextField.setText("");
 
     }
@@ -239,15 +251,15 @@ public class IHM extends Application {
                     idTextField.setDisable(true);
                     nameTextField.setText(rowData.getNom());
                     lnameTextField.setText(rowData.getPrenom());
-                    adressTextField.setText(rowData.getTelephone());
+                    telephoneTextField.setText(rowData.getTelephone());
                     cityTextField.setText(rowData.getVille());
                 }
             });
             return row;
         });
         addButton.setOnAction(e -> {
-            if(! Notification.isEmptyFields(nameTextField, lnameTextField, adressTextField, cityTextField)){
-                Client p = new Client(0, nameTextField.getText(), lnameTextField.getText(), adressTextField.getText(), cityTextField.getText());
+            if(! Notification.isEmptyFields(nameTextField, lnameTextField, telephoneTextField, cityTextField)){
+                Client p = new Client(0, nameTextField.getText(), lnameTextField.getText(), telephoneTextField.getText(), cityTextField.getText());
                 dao.create(p);
                 clearFields();
                 updateListItems();
@@ -258,9 +270,9 @@ public class IHM extends Application {
         });
 
         editButton.setOnAction(e -> {
-            if(! Notification.isEmptyFields(idTextField, nameTextField, lnameTextField, adressTextField, cityTextField)){
+            if(! Notification.isEmptyFields(idTextField, nameTextField, lnameTextField, telephoneTextField, cityTextField)){
                 Client produtResult = dao.find(Integer.parseInt(idTextField.getText()));
-                dao.update(produtResult, nameTextField.getText(), lnameTextField.getText(), adressTextField.getText(), cityTextField.getText());
+                dao.update(produtResult, nameTextField.getText(), lnameTextField.getText(), telephoneTextField.getText(), cityTextField.getText());
                 updateListItems();
                 clearFields();
                 idTextField.setDisable(true);

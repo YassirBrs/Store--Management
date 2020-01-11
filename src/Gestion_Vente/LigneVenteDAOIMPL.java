@@ -79,6 +79,34 @@ public class LigneVenteDAOIMPL implements LigneVenteDAO{
     }
 
     @Override
+    public List<LigneVente> search(int id) {
+        try {
+            String url = "SELECT * FROM lignevente WHERE id_vente=?";
+            List<LigneVente> lists=new ArrayList<>();
+            pstm = dc.conn.prepareStatement(url);
+            pstm.setInt(1, id);
+            ResultSet rs = pstm.executeQuery();
+
+            if (rs.next() == false) {
+                return null;
+            } else {
+                LigneVente flag;
+                do {
+                    Vente v = daoVente.find(rs.getInt("id_vente"));
+                    Produit p = daoProduct.find(rs.getInt("id_produit"));
+                    flag = new LigneVente(id, v, p, rs.getInt("qte"));
+                    lists.add(flag);
+                } while (rs.next());
+                return lists;
+            }
+
+        } catch (Exception eee) {
+            eee.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
     public void update(LigneVente p) {
         try {
             String query = "UPDATE lignevente SET id_produit=?, qte=? WHERE id=?";
