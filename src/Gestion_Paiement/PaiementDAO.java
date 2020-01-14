@@ -15,6 +15,7 @@ public interface PaiementDAO {
     List<Paiement> findAll(int id);
 
     double calculTotal(int id);
+    double totalPayer(int id);
 
 
 }

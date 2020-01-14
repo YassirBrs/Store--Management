@@ -11,6 +11,7 @@ public interface VenteDAO {
     void delete(Vente p);
 
     void update(Vente p);
+    void updateImprimer(int id,String value);
 
     List<Vente> findAll();
 }

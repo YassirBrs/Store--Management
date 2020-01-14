@@ -21,6 +21,24 @@ public class PaiementDAOIMPL implements PaiementDAO {
     }
 
     @Override
+    public double totalPayer(int id) {
+        try {
+            String query = "SELECT SUM(montant) FROM paiement WHERE status LIKE 'Payer' AND id_vente=?";
+            pstm = dc.conn.prepareStatement(query);
+            pstm.setInt(1, id);
+            ResultSet rs;
+            rs = pstm.executeQuery();
+            rs.next();
+            double sum = rs.getDouble(1);
+            return sum;
+
+        }catch(SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    @Override
     public double calculTotal(int id) {
         try {
             String query = "SELECT SUM(montant) FROM paiement WHERE id_vente=?";

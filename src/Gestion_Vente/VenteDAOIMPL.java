@@ -25,7 +25,7 @@ public class VenteDAOIMPL implements VenteDAO {
     @Override
     public Vente find(int id) {
         try {
-            String url = "SELECT vente.id as id, nom, prenom, date, id_client, SUM(prix*qte) as total"
+            String url = "SELECT vente.id as id, nom, prenom, date, id_client, SUM(prix*qte) as total,imprimer"
                     + " FROM client INNER JOIN vente ON client.id=id_client"
                     + " LEFT JOIN lignevente ON vente.id=id_vente"
                     + " LEFT JOIN produit ON produit.id=id_produit"
@@ -44,6 +44,7 @@ public class VenteDAOIMPL implements VenteDAO {
                     Client cli = dao.find(rs.getInt("id_client"));
                     flag = new Vente(id, cli, rs.getString("date"));
                     flag.setTotal(rs.getDouble("total"));
+                    flag.setImprimer(rs.getString("imprimer"));
                 } while (rs.next());
                 return flag;
             }
@@ -98,11 +99,24 @@ public class VenteDAOIMPL implements VenteDAO {
     }
 
     @Override
+    public void updateImprimer(int id, String value) {
+        try {
+            String query = "UPDATE vente SET imprimer=? WHERE id=?";
+            pstm = dc.conn.prepareStatement(query);
+            pstm.setString(1, value);
+            pstm.setInt(2, id);
+            int x = pstm.executeUpdate();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    @Override
     public List<Vente> findAll() {
 
         List<Vente> ventes = new ArrayList<>();
         try {
-            String query = "SELECT vente.id as id, nom, prenom, date, id_client, SUM(prix*qte) as total"
+            String query = "SELECT vente.id as id, nom, prenom, date, id_client, SUM(prix*qte) as total,imprimer"
                     + " FROM client INNER JOIN vente ON client.id=id_client"
                     + " LEFT JOIN lignevente ON vente.id=id_vente"
                     + " LEFT JOIN produit ON produit.id=id_produit"
@@ -114,6 +128,7 @@ public class VenteDAOIMPL implements VenteDAO {
             while (rs.next()) {
                 v = new Vente(rs.getInt("id"), dao.find(rs.getInt("id_client")), rs.getString("date"));
                 v.setTotal(rs.getDouble("total"));
+                v.setImprimer(rs.getString("imprimer"));
                 ventes.add(v);
             }
             return ventes;

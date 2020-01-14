@@ -69,6 +69,7 @@ public class IHM extends Application {
     Button editButton;
     Button deleteButton;
     Button showPaiements;
+    Button transfertButton;
     Button imprimerFacture;
 
     Button addLigne, editLigne, deleteLigne;
@@ -83,6 +84,7 @@ public class IHM extends Application {
     TableColumn<Vente, String> nameColumn;
     TableColumn<Vente, String> dateColumn;
     TableColumn<Vente, Double> totalColumn;
+    TableColumn<Vente, String> imprimerColumn;
     /// pour ligneTable
     TableColumn<LigneVente, Integer> idLigneColumn;
     TableColumn<LigneVente, Integer> produitLigneColumn;
@@ -130,6 +132,7 @@ public class IHM extends Application {
         nameColumn = new TableColumn<>("Nom Complet");
         dateColumn = new TableColumn<>("Date");
         totalColumn = new TableColumn<>("Total");
+        imprimerColumn = new TableColumn<>("Traiter");
 
         idLigneColumn = new TableColumn<>("Id");
         produitLigneColumn = new TableColumn<>("Produit");
@@ -148,10 +151,11 @@ public class IHM extends Application {
         this.editButton = new Button("Modifier");
         this.deleteButton = new Button("Supprimer");
         this.showPaiements = new Button("Paiements");
+        this.transfertButton = new Button("Transactions");
         this.clientLabel = new Label("Client");
         this.dateLabel = new Label("Date");
         Pane header = Header.initt();
-        boxTop.getChildren().addAll(header, (new Navbar(window, "sale")).getHeader());
+        boxTop.getChildren().addAll(header, (new Navbar(window, "vente")).getHeader());
         boxTop.setAlignment(Pos.CENTER);
 
         dateTextField.setDayCellFactory(picker -> new DateCell() {
@@ -171,7 +175,7 @@ public class IHM extends Application {
             }
         });
 
-        leftBox.getChildren().addAll(addButton, editButton, deleteButton, showPaiements);
+        leftBox.getChildren().addAll(addButton, editButton, deleteButton, showPaiements, transfertButton);
         leftBox.setSpacing(10);
 
         centerPane.add(idLabel, 0, 0);
@@ -193,6 +197,7 @@ public class IHM extends Application {
         editButton.getStyleClass().add("buttons");
         deleteButton.getStyleClass().add("buttons");
         showPaiements.getStyleClass().add("buttons");
+        transfertButton.getStyleClass().add("buttons");
         imprimerFacture.getStyleClass().add("imprimer");
 
         imprimerFacture.setAlignment(Pos.TOP_LEFT);
@@ -270,9 +275,10 @@ public class IHM extends Application {
         this.nameColumn.setCellValueFactory(new PropertyValueFactory<>("client"));
         this.dateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
         this.totalColumn.setCellValueFactory(new PropertyValueFactory<>("total"));
+        this.imprimerColumn.setCellValueFactory(new PropertyValueFactory<>("imprimer"));
 
         this.table.setItems(listOfVentes);
-        table.getColumns().addAll(idColumn, nameColumn, dateColumn, totalColumn);
+        table.getColumns().addAll(idColumn, nameColumn, dateColumn, totalColumn, imprimerColumn);
 
         this.idLigneColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
         this.produitLigneColumn.setCellValueFactory(new PropertyValueFactory<>("produit"));
@@ -381,13 +387,19 @@ public class IHM extends Application {
 
         editButton.setOnAction(e -> {
             if (table.getSelectionModel().getSelectedIndex() >= 0) {
-                Vente venteToEdit = dao.find(Integer.parseInt(idTextField.getText()));
-                venteToEdit.setClient(clientComboBox.getSelectionModel().getSelectedItem());
-                venteToEdit.setDate(dateTextField.getValue().format(timeFormatter));
-                dao.update(venteToEdit);
-                updateListItems();
-                clearFields();
-                idTextField.setDisable(false);
+                if (table.getSelectionModel().getSelectedItem().getImprimer().equals("non")) {
+                    Vente venteToEdit = dao.find(Integer.parseInt(idTextField.getText()));
+                    venteToEdit.setClient(clientComboBox.getSelectionModel().getSelectedItem());
+                    venteToEdit.setDate(dateTextField.getValue().format(timeFormatter));
+                    dao.update(venteToEdit);
+                    updateListItems();
+                    clearFields();
+                    idTextField.setDisable(false);
+                } else {
+                    Notification warning = new Notification("Impression");
+                    warning.setType(Alert.AlertType.WARNING);
+                    warning.shows("Facture deja imprimer pour cette vente !");
+                }
             } else {
                 alert.setContentText("Veuillez Sélectionner une vente");
                 alert.showAndWait();
@@ -396,60 +408,85 @@ public class IHM extends Application {
 
         deleteButton.setOnAction(e -> {
             if (table.getSelectionModel().getSelectedIndex() >= 0) {
-                if ((new Notification("ventes")).confirm("Êtes vous sûr de supprimer cette vente?")) {
+                if (table.getSelectionModel().getSelectedItem().getImprimer().equals("non")) {
+                    if ((new Notification("ventes")).confirm("Êtes vous sûr de supprimer cette vente?")) {
 
-                    int beforeSelected = table.getSelectionModel().getSelectedIndex() - 1;
-                    Vente rs = dao.find(Integer.parseInt(idTextField.getText()));
-                    dao.delete(rs);
-                    updateListItems();
-                    if (beforeSelected != 0) {
-                        table.getSelectionModel().select(beforeSelected);
-                    } else {
-                        table.getSelectionModel().select(0);
+                        int beforeSelected = table.getSelectionModel().getSelectedIndex() - 1;
+                        Vente rs = dao.find(Integer.parseInt(idTextField.getText()));
+                        dao.delete(rs);
+                        updateListItems();
+                        if (beforeSelected != 0) {
+                            table.getSelectionModel().select(beforeSelected);
+                        } else {
+                            table.getSelectionModel().select(0);
+                        }
+                        refrechLigneTable(beforeSelected);
+                        clearFields();
                     }
-                    refrechLigneTable(beforeSelected);
-                    clearFields();
+                } else {
+                    Notification warning = new Notification("Impression");
+                    warning.setType(Alert.AlertType.WARNING);
+                    warning.shows("Facture deja imprimer pour cette vente !");
                 }
             } else {
                 alert.setContentText("Veuillez Sélectionner une vente ");
                 alert.showAndWait();
             }
         });
+
         imprimerFacture.setOnAction(e -> {
             if (table.getSelectionModel().getSelectedIndex() >= 0) {
-                List<LigneVente> listVente = daoLigne.search(table.getSelectionModel().getSelectedItem().getId());
-                PDFGenerator pdfGenerator = new PDFGenerator();
-                pdfGenerator.generateBellIntoPdf(listVente, table.getSelectionModel().getSelectedItem());
+                if (table.getSelectionModel().getSelectedItem().getImprimer().equals("non")) {
+                    List<LigneVente> listVente = daoLigne.search(table.getSelectionModel().getSelectedItem().getId());
+                    PDFGenerator pdfGenerator = new PDFGenerator();
+                    pdfGenerator.generateBellIntoPdf(listVente, table.getSelectionModel().getSelectedItem());
+//                    System.out.println("imprim ::" + table.getSelectionModel().getSelectedItem().getImprimer());
+//                    dao.updateImprimer(table.getSelectionModel().getSelectedItem().getId(), "oui");
+//                    table.getSelectionModel().getSelectedItem().setImprimer("oui");
+                    updateListItems();
+                    clearFields();
+                } else {
+                    Notification warning = new Notification("Impression");
+                    warning.setType(Alert.AlertType.WARNING);
+                    warning.shows("Facture deja imprimer pour cette vente !");
+                }
             } else {
                 alert.setContentText("Veuillez séléctionner une vente");
                 alert.showAndWait();
             }
         });
+
         addLigne.setOnAction(e -> {
             if (table.getSelectionModel().getSelectedIndex() >= 0) {
-                existLigneVente = null;
-                if (productsBox.getValue() != null && !qteTextField.getText().equals("")) {
-                    int idvente = table.getSelectionModel().getSelectedItem().getId();
-                    LigneVente lv = new LigneVente(0, dao.find(idvente),
-                            productsBox.getSelectionModel().getSelectedItem(),
-                            Integer.parseInt(qteTextField.getText()));
+                if (table.getSelectionModel().getSelectedItem().getImprimer().equals("non")) {
+                    existLigneVente = null;
+                    if (productsBox.getValue() != null && !qteTextField.getText().equals("")) {
+                        int idvente = table.getSelectionModel().getSelectedItem().getId();
+                        LigneVente lv = new LigneVente(0, dao.find(idvente),
+                                productsBox.getSelectionModel().getSelectedItem(),
+                                Integer.parseInt(qteTextField.getText()));
 
-                    ligneTable.getItems().forEach(item -> {
-                        if (item.getProduit().getId() == lv.getProduit().getId() && item.getVente().getId() == lv.getVente().getId()) {
-                            existLigneVente = item;
+                        ligneTable.getItems().forEach(item -> {
+                            if (item.getProduit().getId() == lv.getProduit().getId() && item.getVente().getId() == lv.getVente().getId()) {
+                                existLigneVente = item;
+                            }
+                        });
+                        if (existLigneVente == null) {
+                            daoLigne.create(lv);
+                        } else {
+                            existLigneVente.setQte(existLigneVente.getQte() + lv.getQte());
+                            daoLigne.update(existLigneVente);
                         }
-                    });
-                    if (existLigneVente == null) {
-                        daoLigne.create(lv);
+                        refrechLigneTable(idvente);
+                        clearLigneFields();
                     } else {
-                        existLigneVente.setQte(existLigneVente.getQte() + lv.getQte());
-                        daoLigne.update(existLigneVente);
+                        alert.setContentText("Sélectionner un produit et définir une quantité");
+                        alert.showAndWait();
                     }
-                    refrechLigneTable(idvente);
-                    clearLigneFields();
                 } else {
-                    alert.setContentText("Sélectionner un produit et définir une quantité");
-                    alert.showAndWait();
+                    Notification warning = new Notification("Impression");
+                    warning.setType(Alert.AlertType.WARNING);
+                    warning.shows("Facture deja imprimer pour cette vente !");
                 }
             } else {
                 alert.setContentText("Veuillez séléctionner une vente");
@@ -459,63 +496,74 @@ public class IHM extends Application {
         });
 
         editLigne.setOnAction(e -> {
-            if (ligneTable.getSelectionModel().getSelectedIndex() >= 0) {
-                int idvente = ligneTable.getSelectionModel().getSelectedItem().getId();
-                LigneVente lv = daoLigne.find(idvente);
-                PaiementDAOIMPL p = new PaiementDAOIMPL();
-                int qt = Integer.parseInt(qteTextField.getText());
-                double total = table.getSelectionModel().getSelectedItem().getTotal() - ligneTable.getSelectionModel().getSelectedItem().getSubtotal();
-                double ligne = productsBox.getSelectionModel().getSelectedItem().getPrix() * qt;
-                double paiement = p.calculTotal(table.getSelectionModel().getSelectedItem().getId());
-                System.out.println("total :" + total);
-                System.out.println("new sub :" + ligne);
-                System.out.println("paiement :" + paiement);
+            if (table.getSelectionModel().getSelectedItem().getImprimer().equals("non")) {
+                if (ligneTable.getSelectionModel().getSelectedIndex() >= 0) {
+                    int idvente = ligneTable.getSelectionModel().getSelectedItem().getId();
+                    LigneVente lv = daoLigne.find(idvente);
+                    PaiementDAOIMPL p = new PaiementDAOIMPL();
+                    int qt = Integer.parseInt(qteTextField.getText());
+                    double total = table.getSelectionModel().getSelectedItem().getTotal() - ligneTable.getSelectionModel().getSelectedItem().getSubtotal();
+                    double ligne = productsBox.getSelectionModel().getSelectedItem().getPrix() * qt;
+                    double paiement = p.calculTotal(table.getSelectionModel().getSelectedItem().getId());
+                    System.out.println("total :" + total);
+                    System.out.println("new sub :" + ligne);
+                    System.out.println("paiement :" + paiement);
 
-                if (total + ligne > paiement) {
-                    lv.setProduit(productsBox.getSelectionModel().getSelectedItem());
-                    lv.setQte(qt);
-                    daoLigne.update(lv);
-                    refrechLigneTable(idvente);
-                    clearLigneFields();
+                    if (total + ligne > paiement) {
+                        lv.setProduit(productsBox.getSelectionModel().getSelectedItem());
+                        lv.setQte(qt);
+                        daoLigne.update(lv);
+                        refrechLigneTable(idvente);
+                        clearLigneFields();
+                    } else {
+                        Notification warning = new Notification("Modification Ligne de commande");
+                        warning.setType(Alert.AlertType.ERROR);
+                        warning.shows("Impossible de Modifier ! Commande deja payer");
+                    }
                 } else {
-                    Notification warning = new Notification("Modification Ligne de commande");
-                    warning.setType(Alert.AlertType.ERROR);
-                    warning.shows("Impossible de Modifier ! Commande deja payer");
+                    alert.setContentText("Veuillez séléctionner une ligne de vente");
+                    alert.showAndWait();
                 }
             } else {
-                alert.setContentText("Veuillez séléctionner une ligne de vente");
-                alert.showAndWait();
+                Notification warning = new Notification("Impression");
+                warning.setType(Alert.AlertType.WARNING);
+                warning.shows("Facture deja imprimer pour cette vente !");
             }
         });
 
         deleteLigne.setOnAction(e -> {
-            if (ligneTable.getSelectionModel().getSelectedIndex() >= 0) {
-                if ((new Notification("ventes")).confirm("Êtes vous sûr de supprimer cette ligne de vente?")) {
+            if (table.getSelectionModel().getSelectedItem().getImprimer().equals("non")) {
+                if (ligneTable.getSelectionModel().getSelectedIndex() >= 0) {
+                    if ((new Notification("ventes")).confirm("Êtes vous sûr de supprimer cette ligne de vente?")) {
 
-                    int idvente = ligneTable.getSelectionModel().getSelectedItem().getVente().getId();
-                    PaiementDAOIMPL p = new PaiementDAOIMPL();
-                    double totalPaiement = p.calculTotal(idvente);
-                    if (table.getSelectionModel().getSelectedItem().getTotal() - ligneTable.getSelectionModel().getSelectedItem().getSubtotal() > totalPaiement) {
-                        LigneVente lv = ligneTable.getSelectionModel().getSelectedItem();
-                        daoLigne.delete(lv);
-                        refrechLigneTable(idvente);
-                        clearLigneFields();
-                    } else {
-                        Notification warning = new Notification("Ligne de Commande");
-                        warning.setType(Alert.AlertType.ERROR);
-                        warning.shows("Impossible de Supprimer ! Commande deja payer ");
+                        int idvente = ligneTable.getSelectionModel().getSelectedItem().getVente().getId();
+                        PaiementDAOIMPL p = new PaiementDAOIMPL();
+                        double totalPaiement = p.calculTotal(idvente);
+                        if (table.getSelectionModel().getSelectedItem().getTotal() - ligneTable.getSelectionModel().getSelectedItem().getSubtotal() > totalPaiement) {
+                            LigneVente lv = ligneTable.getSelectionModel().getSelectedItem();
+                            daoLigne.delete(lv);
+                            refrechLigneTable(idvente);
+                            clearLigneFields();
+                        } else {
+                            Notification warning = new Notification("Ligne de Commande");
+                            warning.setType(Alert.AlertType.ERROR);
+                            warning.shows("Impossible de Supprimer ! Commande deja payer ");
+                        }
                     }
+                } else {
+                    alert.setContentText("Veuillez séléctionner une ligne de vente");
+                    alert.showAndWait();
                 }
             } else {
-                alert.setContentText("Veuillez séléctionner une ligne de vente");
-                alert.showAndWait();
+                Notification warning = new Notification("Impression");
+                warning.setType(Alert.AlertType.WARNING);
+                warning.shows("Facture deja imprimer pour cette vente !");
             }
         });
 
         showPaiements.setOnAction(e -> {
             if (table.getSelectionModel().getSelectedIndex() >= 0) {
                 if (table.getSelectionModel().getSelectedItem().getTotal() > 0) {
-                    int idvente = table.getSelectionModel().getSelectedItem().getId();
                     Gestion_Paiement.IHM paiementIHM = new Gestion_Paiement.IHM(Integer.parseInt(idTextField.getText()));
                     paiementIHM.start(primaryStage);
                 } else {
@@ -526,6 +574,11 @@ public class IHM extends Application {
                 alert.setContentText("Veuillez séléctionner une vente");
                 alert.showAndWait();
             }
+        });
+
+        transfertButton.setOnAction(e -> {
+            Gestion_Transfert.IHM transfertIHM = new Gestion_Transfert.IHM();
+            transfertIHM.start(primaryStage);
         });
 
         primaryStage.setTitle("Store Management");

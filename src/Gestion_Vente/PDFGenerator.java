@@ -1,24 +1,16 @@
 package Gestion_Vente;
 
-import java.awt.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.awt.Desktop;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.StringReader;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
+
 
 import Gestion_Client.Client;
+import Gestion_Paiement.PaiementDAOIMPL;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.pdf.PdfWriter;
@@ -59,10 +51,14 @@ public class PDFGenerator {
             document.addCreationDate();
 
             XMLWorkerHelper worker = XMLWorkerHelper.getInstance();
+            PaiementDAOIMPL daoimpl=new PaiementDAOIMPL();
             Client c = vente.getClient();
             String ht = new DecimalFormat("##.##").format(vente.getTotal());
             String tva = new DecimalFormat("##.##").format(vente.getTotal()*0.2);
             String total = new DecimalFormat("##.##").format(vente.getTotal()+vente.getTotal()*0.2);
+            String payer = new DecimalFormat("##.##").format(daoimpl.totalPayer(vente.getId()));
+            String totalDU = new DecimalFormat("##.##").format(vente.getTotal()+vente.getTotal()*0.2-daoimpl.totalPayer(vente.getId()));
+
             String str = "<html>\r\n" + "	<head>\r\n" + "		<style>\r\n"
                     + "			#Global #gauche {\r\n" + "				float:left;\r\n"
                     + "				width:60%;\r\n" + "			}\r\n"
@@ -74,7 +70,7 @@ public class PDFGenerator {
                     + "	<div  id=\"contentToConvert\" > \r\n"
                     + "		<div class=\"contentToConvert\" id=\"contentToConvert\" >\r\n"
                     + "			<h1  style=\"text-align: center;margin-top: 0;margin-bottom: 0.5rem;color:red;\">Facture "
-                    + vente.getId() + "</h1>\r\n" + "			<b>Socete X</b>\r\n"
+                    + vente.getId() + "</h1>\r\n" + "			<b>Societe X SARL.</b>\r\n"
                     + "			<p style=\"margin-top: 0;margin-bottom: 1rem;\">Hay Salam N 26</p>\r\n"
                     + "			<p style=\"margin-top: 0;margin-bottom: 1rem;\">Maroc 80000</p>\r\n"
                     + "			<p style=\"margin-top: 0;margin-bottom: 1rem;\">0637834832</p>\r\n"
@@ -82,21 +78,21 @@ public class PDFGenerator {
                     + "			<table style=\"    width: 100%;\">\r\n"
                     + "				<tr>\r\n"
                     + "					<td style=\"width:80%;\"></td>\r\n"
-                    + "					<td><b>" + c.getNom() + " " + c.getPrenom() + "</b></td>\r\n"
+                    + "					<td><p style=\"margin-top: 0;margin-bottom: 1rem;color:blue;font-weight: bold;\">" + c.getNom() + " " + c.getPrenom() + "</p></td>\r\n"
                     + "				</tr>\r\n" + "				<tr>\r\n"
                     + "					<td style=\"width:80%;\">\r\n"
                     + "						<p style=\"margin-top: 0;margin-bottom: 1rem;\">Reference : "
                     + vente.getId()+""+c.getId() + "</p>\r\n"
-                    + "						<p style=\"margin-top: 0;margin-bottom: 1rem;\">Date :      "
+                    + "						<p style=\"margin-top: 0;margin-bottom: 1rem;c\">Date      : "
                     + vente.getDate() + "</p>\r\n"
-                    + "						<p style=\"margin-top: 0;margin-bottom: 1rem;\">N Client :  "
+                    + "						<p style=\"margin-top: 0;margin-bottom: 1rem;\">N Client  : "
                     + c.getId() + "</p>\r\n" + "					</td>\r\n"
                     + "					<td><p style=\"margin-top: 0;margin-bottom: 1rem;\">"
                     + c.getVille() + "</p>\r\n"
                     + "					<p style=\"margin-top: 0;margin-bottom: 1rem;\">Maroc 80000</p></td>\r\n"
                     + "				</tr>\r\n" + "			</table>\r\n"
-                    + "			\r\n" + "			<div style=\"padding-top:100px;\">\r\n"
-                    + "				<p style=\"margin-top: 0;margin-bottom: 35px;\"> Listes des Produits :</p>\r\n"
+                    + "			\r\n" + "			<div style=\"padding-top:20px;\">\r\n"
+                    + "				<p style=\"margin-top: 0;margin-bottom: 15px;\"> Liste des Produits :</p>\r\n"
                     + "				<table class=\"table\" style=\"width: 100%;margin-bottom: 1rem;\">\r\n"
                     + "					<tr style=\"border-color:red;\">\r\n"
                     + "					  <td style=\"padding: 0.75rem;vertical-align: top; border: 1px solid #dee2e6;\"><b>Description</b></td>\r\n"
@@ -123,8 +119,27 @@ public class PDFGenerator {
                     + "					<td style=\"width:20%;padding: 0.75rem;vertical-align: top;\">TOTAL NET</td>\r\n"
                     + "					<td style=\"padding: 0.75rem;vertical-align: top;\">"
                     + total + " MAD</td>\r\n" + "				</tr>\r\n"
+                    + "				<tr style=\"border:solid 2px;\">\r\n"
+                    + "					<td style=\"width:60%;\"></td>\r\n"
+                    + "					<td style=\"width:20%;padding: 0.75rem;vertical-align: top;\">MONTANT Payer</td>\r\n"
+                    + "					<td style=\"padding: 0.75rem;vertical-align: top;\">"
+                    + payer + " MAD</td>\r\n" + "				</tr>\r\n"
+                    + "				<tr style=\"padding: 0.75rem;vertical-align: top; border: 1px solid #dee2e6;\">\r\n"
+                    + "					<td style=\"width:60%;\"></td>\r\n"
+                    + "					<td style=\"width:20%;padding: 0.75rem;vertical-align: top;color:red;\">TOTAL DÜ</td>\r\n"
+                    + "					<td style=\"padding: 0.75rem;vertical-align: top; border: 3px solid #dee2e6;color:red;\">"
+                    +  totalDU+ " MAD</td>\r\n" + "				</tr>\r\n"
+                    + "			</table>\r\n"
+                    + "			<br>\r\n" +"</br>\r\n" + "<hr>\r\n" + "</hr>\r\n"
+                    +"<table style=\"    width: 100%;margin-top:10px;\">\r\n"
+                    + "				<tr style=\"padding: 0.75rem;vertical-align: top; \">\r\n"
+                    + "					<td style=\"width:60%;\"></td>\r\n"
+                    + "					<td style=\"width:20%;padding: 0.75rem;vertical-align: top;\">Signature :</td>\r\n"
+                    + "					<td style=\"padding: 0.75rem;vertical-align: top; \">  </td>\r\n"
+                    + "				</tr>\r\n"
                     + "			</table>\r\n" + "			</div>\r\n" + "		</div>\r\n"
-                    + "	<div style=\"text-align:center;\"><p style=\"margin-top: 180px;margin-bottom: 1rem;\">RC 12345 -Siége social :Hay Salam N 26 N° d'identifiant fiscal: 12346578 - Tel: 0637834832 -Email : yourstore@gmail.com site web www.yourstore.com</p></div>"
+                    + "	<div style=\"text-align:center;\"><p style=\"margin-top: 130px;margin-bottom: 1rem;position: absolute;\n" +
+                    "    bottom: 0;\">RC 12345 -Siége social :Hay Salam N 26 N° d'identifiant fiscal: 12346578 - Tel: 0637834832 -Email : yourstore@gmail.com site web www.yourstore.com</p></div>"
                     + "</body>\r\n" + "</html>";
             worker.parseXHtml(pdfWriter, document, new StringReader(str));
             document.close();

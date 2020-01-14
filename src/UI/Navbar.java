@@ -8,8 +8,8 @@ public class Navbar {
     private String activeWindow;
     private Stage window;
     Pane root = new Pane();
-    HBox links;
-    Button categories, products, clients, ventes;
+    HBox liens;
+    Button categories, produits, clients, ventes,transfert;
     
     public Navbar(Stage window, String activeWindow){
         this.activeWindow = activeWindow;
@@ -17,37 +17,41 @@ public class Navbar {
     }
     
     public void initHeader(){
-        links = new HBox();
+        liens = new HBox();
         categories = new Button("Catégories");
-        products = new Button("Produits");
+        produits = new Button("Produits");
         clients = new Button("Clients");
         ventes = new Button("Ventes");
+        transfert = new Button("Transactions");
     }
     
     public void applyStyles(){
-        this.categories.getStyleClass().add("header_btn");
-        this.products.getStyleClass().add("header_btn");
-        this.clients.getStyleClass().add("header_btn");
-        this.ventes.getStyleClass().add("header_btn");
-        
-        if(this.activeWindow.equals("category")){
+        this.categories.getStyleClass().add("navbar_btn");
+        this.produits.getStyleClass().add("navbar_btn");
+        this.clients.getStyleClass().add("navbar_btn");
+        this.ventes.getStyleClass().add("navbar_btn");
+        this.transfert.getStyleClass().add("navbar_btn");
+
+        if(this.activeWindow.equals("categorie")){
             this.categories.getStyleClass().add("btn_active");
-        }else if(this.activeWindow.equals("product")){
-            this.products.getStyleClass().add("btn_active");
+        }else if(this.activeWindow.equals("produit")){
+            this.produits.getStyleClass().add("btn_active");
         }else if(this.activeWindow.equals("client")){
             this.clients.getStyleClass().add("btn_active");
-        }else if(this.activeWindow.equals("sale") || this.activeWindow.equals("payement")){
+        }else if(this.activeWindow.equals("vente") || this.activeWindow.equals("payement")){
             this.ventes.getStyleClass().add("btn_active");
+        }else if(this.activeWindow.equals("transfert") ){
+            this.transfert.getStyleClass().add("btn_active");
         }
     }
     
-    public void actions(){
+    public void buttons(){
         categories.setOnAction(e -> {
             Gestion_Categorie.IHM catIhm = new Gestion_Categorie.IHM();
             catIhm.start(window);
         });
         
-        products.setOnAction(e -> {
+        produits.setOnAction(e -> {
             Gestion_Produit.IHM proIhm = new Gestion_Produit.IHM();
             proIhm.start(window);
         });
@@ -60,19 +64,22 @@ public class Navbar {
         ventes.setOnAction(e -> {
             Gestion_Vente.IHM venIhm = new Gestion_Vente.IHM();
             venIhm.start(window);
+        });transfert.setOnAction(e -> {
+            Gestion_Transfert.IHM transfertIhm = new Gestion_Transfert.IHM();
+            transfertIhm.start(window);
         });
     }
     
     public void draw(){
-        links.getChildren().addAll( products,categories, clients, ventes);
-        root.getChildren().add(links);
+        liens.getChildren().addAll( produits,categories, clients, ventes,transfert);
+        root.getChildren().add(liens);
     }
 
     public Pane getHeader(){
         initHeader();
         applyStyles();
         draw();
-        actions();
+        buttons();
         return root;
     }
     

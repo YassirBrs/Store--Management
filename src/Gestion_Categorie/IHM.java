@@ -79,7 +79,7 @@ public class IHM extends Application {
         this.descLabel = new Label("Description");
         this.nomLabel = new Label("Nom");
         Pane header= Header.initt();
-        boxTop.getChildren().addAll(header, (new Navbar(window, "category")).getHeader());
+        boxTop.getChildren().addAll(header, (new Navbar(window, "categorie")).getHeader());
         boxTop.setAlignment(Pos.CENTER);
 
         leftBox.getChildren().addAll(addButton, editButton, deleteButton);

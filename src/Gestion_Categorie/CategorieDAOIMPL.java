@@ -32,11 +32,11 @@ public class CategorieDAOIMPL implements CategorieDAO {
             if (rs.next() == false) {
                 return null;
             } else {
-                Categorie flag;
+                Categorie c;
                 do {
-                    flag = new Categorie(id, rs.getString("nom"), rs.getString("description"));
+                    c = new Categorie(id, rs.getString("nom"), rs.getString("description"));
                 } while (rs.next());
-                return flag;
+                return c;
             }
         } catch (Exception eee) {
             eee.printStackTrace();
@@ -126,14 +126,14 @@ public class CategorieDAOIMPL implements CategorieDAO {
             if (rs.next() == false) {
                 return null;
             } else {
-                Categorie flag;
+                Categorie c;
                 do {
-                    flag = new Categorie(rs.getInt("id"), rs.getString("nom"), rs.getString("description"));
+                    c = new Categorie(rs.getInt("id"), rs.getString("nom"), rs.getString("description"));
                 } while (rs.next());
-                return flag;
+                return c;
             }
-        } catch (Exception eee) {
-            eee.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return null;
     }

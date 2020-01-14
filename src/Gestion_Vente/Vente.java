@@ -8,6 +8,15 @@ public class Vente {
     private Client client;
     private String date;
     private double total;
+    private String imprimer;
+
+    public String getImprimer() {
+        return imprimer;
+    }
+
+    public void setImprimer(String imprimer) {
+        this.imprimer = imprimer;
+    }
 
     public Vente(int id, Client client, String date) {
         this.id = id;

@@ -58,9 +58,7 @@ public class ProduitDAOIMPL implements ProduitDAO {
     @Override
     public void create(Produit p) {
        
-    try{      
-        
-            
+    try{
             String query = "INSERT INTO produit (designation, prix, catid) VALUES(?,?,?)";
             pstm = dc.conn.prepareStatement(query);
             pstm.setString(1, p.getDesignation());
@@ -68,7 +66,6 @@ public class ProduitDAOIMPL implements ProduitDAO {
             int id = p.getCatid().getId();
             pstm.setInt(3, id);
              int rows = pstm.executeUpdate();
-             System.out.println("Produit inséré !");
         }catch(SQLException e){
             e.printStackTrace();
         }

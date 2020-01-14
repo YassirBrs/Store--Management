@@ -91,7 +91,7 @@ public class IHM extends Application {
         this.prixLabel = new Label("Prix");
         idTextField.setDisable(true);
         Pane header= Header.initt();
-        boxTop.getChildren().addAll(header, (new Navbar(window, "product")).getHeader());
+        boxTop.getChildren().addAll(header, (new Navbar(window, "produit")).getHeader());
         boxTop.setAlignment(Pos.CENTER);
 
         leftBox.getChildren().addAll(addButton, editButton, deleteButton);

@@ -1,7 +1,10 @@
 package Gestion_Paiement;
 
+import Gestion_Transfert.Transfert;
+import Gestion_Transfert.TransfertDAOIMPL;
 import Gestion_Vente.VenteDAOIMPL;
 
+import java.awt.event.ActionEvent;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -35,13 +38,13 @@ public class IHM extends Application {
     private GridPane centerPane;
     private VBox rightBox;
     Label gestionLabel;
-    Label idVenteLabel, idLabel, montantLabel, dateLabel, payerLabel, typeLabel;
-    TextField idVenteTextField, idTextField, montantTextField;
+    Label idVenteLabel, idLabel, montantLabel, dateLabel, payerLabel, typeLabel, ribLabel, bankLabel;
+    TextField idVenteTextField, idTextField, montantTextField, ribTextField, bankTextField;
     DatePicker dateTextField;
     DateTimeFormatter timeFormatter;
     ObservableList<String> payerList = FXCollections.observableArrayList("Payer", "Non Payer");
     ComboBox<String> payerCombobox = new ComboBox<>();
-    ObservableList<String> typeList = FXCollections.observableArrayList("Espèce", "Chèque", "Traite", "Onligne");
+    ObservableList<String> typeList = FXCollections.observableArrayList("Espèce", "Chèque", "Traite", "Virement");
     ComboBox<String> typesBox = new ComboBox<>();
     Button addButton;
     Button editButton;
@@ -63,7 +66,7 @@ public class IHM extends Application {
 
     int idVenteFromSales;
 
-    Notification forms = new Notification("paiements");
+    Notification warning = new Notification("paiements");
 
     public IHM(int idVenteFromSales) {
         this.idVenteFromSales = idVenteFromSales;
@@ -107,6 +110,8 @@ public class IHM extends Application {
         this.idTextField = new TextField();
         this.idTextField.setDisable(true);
         this.montantTextField = new TextField();
+        this.ribTextField = new TextField();
+        this.bankTextField = new TextField();
         this.dateTextField = new DatePicker();
         this.dateTextField.setPromptText("dd-mm-yyyy");
         this.timeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
@@ -117,6 +122,8 @@ public class IHM extends Application {
         this.dateLabel = new Label("Date");
         this.payerLabel = new Label("Status");
         this.typeLabel = new Label("Type");
+        this.ribLabel = new Label("RIB");
+        this.bankLabel = new Label("BANK");
         this.resteLabel = new Label("  Reste :  ");
         this.resteValueLabel = new Label();
         this.totalValueLabel = new Label();
@@ -125,6 +132,7 @@ public class IHM extends Application {
         payerCombobox.setItems(payerList);
         typesBox.setItems(typeList);
         payerCombobox.getSelectionModel().select(1);
+        typesBox.getSelectionModel().select(1);
         Pane header = Header.initt();
         boxTop.getChildren().addAll(header, (new Navbar(window, "payement")).getHeader());
         boxTop.setAlignment(Pos.CENTER);
@@ -134,7 +142,7 @@ public class IHM extends Application {
                 super.updateItem(date, empty);
                 LocalDate today = LocalDate.now();
 
-                setDisable(empty || date.compareTo(today) < 0 );
+                setDisable(empty || date.compareTo(today) < 0);
             }
         });
         montantTextField.textProperty().addListener(new ChangeListener<String>() {
@@ -161,6 +169,10 @@ public class IHM extends Application {
         centerPane.add(dateTextField, 1, 5);
         centerPane.add(payerLabel, 0, 6);
         centerPane.add(payerCombobox, 1, 6);
+        centerPane.add(bankLabel, 0, 7);
+        centerPane.add(bankTextField, 1, 7);
+        centerPane.add(ribLabel, 0, 8);
+        centerPane.add(ribTextField, 1, 8);
         centerPane.setPadding(new Insets(10));
 
         gestionLabel.getStyleClass().add("gestion_label");
@@ -192,6 +204,15 @@ public class IHM extends Application {
         resteBox.getStyleClass().add("resteBox");
         resteBox.setHgap(20);
         resteBox.setVgap(27);
+
+        idLabel.getStyleClass().add("labels");
+        idVenteLabel.getStyleClass().add("labels");
+        dateLabel.getStyleClass().add("labels");
+        montantLabel.getStyleClass().add("labels");
+        typeLabel.getStyleClass().add("labels");
+        payerLabel.getStyleClass().add("labels");
+        ribLabel.getStyleClass().add("labels");
+        bankLabel.getStyleClass().add("labels");
 
         paidLabel.getStyleClass().add("resteLabels");
         paidValueLabel.getStyleClass().add("payer");
@@ -232,6 +253,11 @@ public class IHM extends Application {
         listOfPaiements.addAll(getPaiementsList());
     }
 
+//    public void updateState() {
+//        boolean enabled = this.typesBox.getSelectionModel().equals("Virement");
+//
+//    }
+
     public void initTable() {
 
         this.idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -239,12 +265,7 @@ public class IHM extends Application {
         this.dateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
         this.typeColumn.setCellValueFactory(new PropertyValueFactory<>("type"));
         this.statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
-//        if (this.statusColumn.getText().equals("Payer")){
-//            this.statusColumn.setStyle("-fx-background-color: green;");
-//        }else{
-//            this.statusColumn.setStyle("-fx-background-color: red;");
-//            System.out.println(this.st);
-//        }
+
 
         this.table.setItems(listOfPaiements);
         table.getColumns().addAll(idColumn, montantColumn, dateColumn, typeColumn, statusColumn);
@@ -255,8 +276,9 @@ public class IHM extends Application {
         this.montantTextField.setText("");
         this.dateTextField.setValue(null);
         this.payerCombobox.setValue(null);
-        this.typesBox.setValue(null);
+//        this.typesBox.setValue(null);
     }
+
 
     @Override
     public void start(Stage primaryStage) {
@@ -264,6 +286,7 @@ public class IHM extends Application {
         initPane();
         initElement(primaryStage);
         initTable();
+//        updateState();
         root.setTop(boxTop);
         root.setLeft(leftBox);
         root.setCenter(centerBox);
@@ -298,13 +321,15 @@ public class IHM extends Application {
                 @Override
                 protected void updateItem(String item, boolean empty) {
                     super.updateItem(item, empty); //This is mandatory
-                    //                    setText(empty ? null : statusColumn.getText());
-                    if (item == null) { //If the cell is empty
+                    if (item == null || empty) { //If the cell is empty
                         setText("");
                     } else if (item.equals("Payer")) {
                         setText(item);
                         TableRow currt = getTableRow();
-                        currt.setStyle("-fx-background-color: lightgreen"); //The background of the cell in yellow
+                        try {
+                            currt.setStyle("-fx-background-color: lightgreen"); //The background of the cell in yellow
+                        } catch (Exception e) {
+                        }
                     } else if (item.equals("Non Payer")) {
                         setText(item);
                         TableRow currt = getTableRow();
@@ -330,28 +355,57 @@ public class IHM extends Application {
 
                 if (paid < total) {
                     if ((montant + paid) <= total) {
-                        Paiement p = new Paiement(
-                                (new VenteDAOIMPL()).find(Integer.parseInt(idVenteTextField.getText())),
-                                Double.parseDouble(montantTextField.getText()),
-                                dateTextField.getValue().format(timeFormatter),
-                                payerCombobox.getValue(),
-                                typesBox.getValue()
-                        );
-                        dao.create(p);
-                        clearFields();
-                        updateListItems();
-                        initRest(paiements);
+                        if (typesBox.getValue().equals("Virement")) {
+                            if (!ribTextField.getText().isEmpty() && !bankTextField.getText().isEmpty()) {
+                                Paiement p = new Paiement(
+                                        (new VenteDAOIMPL()).find(Integer.parseInt(idVenteTextField.getText())),
+                                        Double.parseDouble(montantTextField.getText()),
+                                        dateTextField.getValue().format(timeFormatter),
+                                        payerCombobox.getValue(),
+                                        typesBox.getValue()
+                                );
+                                Transfert t = new Transfert(
+                                        p.getVente().getClient().getNom(),
+                                        p.getVente().getClient().getPrenom(),
+                                        ribTextField.getText(),
+                                        bankLabel.getText(),
+                                        Double.parseDouble(montantTextField.getText()),
+                                        dateTextField.getValue().format(timeFormatter)
+                                );
+                                TransfertDAOIMPL ddao=new TransfertDAOIMPL();
+                                ddao.create(t);
+                                dao.create(p);
+                                clearFields();
+                                updateListItems();
+                                initRest(paiements);
+                            }else{
+                                warning.setType(Alert.AlertType.WARNING);
+                                warning.shows("Veuillez remplir tous les champs");
+                            }
+                        } else {
+                            Paiement p = new Paiement(
+                                    (new VenteDAOIMPL()).find(Integer.parseInt(idVenteTextField.getText())),
+                                    Double.parseDouble(montantTextField.getText()),
+                                    dateTextField.getValue().format(timeFormatter),
+                                    payerCombobox.getValue(),
+                                    typesBox.getValue()
+                            );
+                            dao.create(p);
+                            clearFields();
+                            updateListItems();
+                            initRest(paiements);
+                        }
                     } else {
-                        forms.setType(Alert.AlertType.ERROR);
-                        forms.shows("Vous avez dépassé le montant total de la vente!");
+                        warning.setType(Alert.AlertType.ERROR);
+                        warning.shows("Vous avez dépassé le montant total de la vente!");
                     }
                 } else {
-                    forms.setType(Alert.AlertType.ERROR);
-                    forms.shows("Cette vente est déja réglé");
+                    warning.setType(Alert.AlertType.ERROR);
+                    warning.shows("Cette vente est déja réglé");
                 }
             } else {
-                forms.setType(Alert.AlertType.WARNING);
-                forms.shows("Veuillez remplir tous les champs");
+                warning.setType(Alert.AlertType.WARNING);
+                warning.shows("Veuillez remplir tous les champs");
             }
         });
 
@@ -372,18 +426,18 @@ public class IHM extends Application {
                     updateListItems();
                     initRest(paiements);
                 } else {
-                    forms.setType(Alert.AlertType.ERROR);
-                    forms.shows("Vous avez dépassé le montant total de la vente!");
+                    warning.setType(Alert.AlertType.ERROR);
+                    warning.shows("Vous avez dépassé le montant total de la vente!");
                 }
             } else {
-                forms.setType(Alert.AlertType.WARNING);
-                forms.shows("Veuillez séléctionner un paiement et remplir tous les champs");
+                warning.setType(Alert.AlertType.WARNING);
+                warning.shows("Veuillez séléctionner un paiement et remplir tous les champs");
             }
         });
 
         deleteButton.setOnAction(e -> {
             if (!Notification.isEmptyFields(idTextField)) {
-                if (forms.confirm("Êtes vous sûr de supprimer ce paiement?")) {
+                if (warning.confirm("Êtes vous sûr de supprimer ce paiement?")) {
                     Paiement p = (new PaiementDAOIMPL()).find(Integer.parseInt(idTextField.getText()));
                     dao.delete(p);
                     clearFields();
@@ -391,10 +445,20 @@ public class IHM extends Application {
                     initRest(paiements);
                 }
             } else {
-                forms.setType(Alert.AlertType.WARNING);
-                forms.shows("Veuillez séléctionner un paiement");
+                warning.setType(Alert.AlertType.WARNING);
+                warning.shows("Veuillez séléctionner un paiement");
             }
         });
+        typesBox.getSelectionModel().selectedItemProperty().addListener((options, oldValue, newValue) -> {
+                    boolean en = newValue.equals("Virement");
+                    ribLabel.setDisable(!en);
+                    ribTextField.setDisable(!en);
+                    bankLabel.setDisable(!en);
+                    bankTextField.setDisable(!en);
+
+                }
+        );
+
 
         primaryStage.setTitle("Store Management");
 

@@ -11,6 +11,8 @@
 .mtj.tmp/
 
 # Package Files #
+*.pdf
+*.jar
 *.war
 *.nar
 *.ear

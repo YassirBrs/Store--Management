@@ -9,7 +9,7 @@ public class DataConnection {
     public static DataConnection db;
     private DataConnection(){
         try{
-            String url = "jdbc:mysql://localhost:3306/javafxstore?serverTimezone=Africa/Casablanca";
+            String url = "jdbc:mysql://localhost:3306/javafxstore";
             conn = DriverManager.getConnection(url , "root" ,"");
         }catch(SQLException e){
            e.printStackTrace();
