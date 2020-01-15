@@ -1,9 +1,10 @@
 package Gestion_Transfert;
 
 
-import Gestion_Paiement.Paiement;
 
-public class Transfert {
+import java.io.Serializable;
+
+public class Transfert implements Serializable {
     private int id;
     private String nom;
     private String prenom;

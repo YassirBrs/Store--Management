@@ -53,11 +53,11 @@ public class PDFGenerator {
             XMLWorkerHelper worker = XMLWorkerHelper.getInstance();
             PaiementDAOIMPL daoimpl=new PaiementDAOIMPL();
             Client c = vente.getClient();
-            String ht = new DecimalFormat("##.##").format(vente.getTotal());
+            String ht = new DecimalFormat("##.##").format(0.8*vente.getTotal());
             String tva = new DecimalFormat("##.##").format(vente.getTotal()*0.2);
-            String total = new DecimalFormat("##.##").format(vente.getTotal()+vente.getTotal()*0.2);
+            String total = new DecimalFormat("##.##").format(vente.getTotal());
             String payer = new DecimalFormat("##.##").format(daoimpl.totalPayer(vente.getId()));
-            String totalDU = new DecimalFormat("##.##").format(vente.getTotal()+vente.getTotal()*0.2-daoimpl.totalPayer(vente.getId()));
+            String totalDU = new DecimalFormat("##.##").format(vente.getTotal()-daoimpl.totalPayer(vente.getId()));
 
             String str = "<html>\r\n" + "	<head>\r\n" + "		<style>\r\n"
                     + "			#Global #gauche {\r\n" + "				float:left;\r\n"
@@ -78,7 +78,7 @@ public class PDFGenerator {
                     + "			<table style=\"    width: 100%;\">\r\n"
                     + "				<tr>\r\n"
                     + "					<td style=\"width:80%;\"></td>\r\n"
-                    + "					<td><p style=\"margin-top: 0;margin-bottom: 1rem;color:blue;font-weight: bold;\">" + c.getNom() + " " + c.getPrenom() + "</p></td>\r\n"
+                    + "					<td><p style=\"margin-top: 0;margin-bottom: 1rem;color:blue;font-weight: bold;\">" + c.getNom().toUpperCase() + " " + c.getPrenom().toUpperCase() + "</p></td>\r\n"
                     + "				</tr>\r\n" + "				<tr>\r\n"
                     + "					<td style=\"width:80%;\">\r\n"
                     + "						<p style=\"margin-top: 0;margin-bottom: 1rem;\">Reference : "

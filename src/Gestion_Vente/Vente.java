@@ -2,7 +2,9 @@ package Gestion_Vente;
 
 import Gestion_Client.Client;
 
-public class Vente {
+import java.io.Serializable;
+
+public class Vente implements Serializable {
 
     private int id;
     private Client client;

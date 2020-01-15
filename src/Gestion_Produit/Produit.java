@@ -2,7 +2,9 @@ package Gestion_Produit;
 
 import Gestion_Categorie.Categorie;
 
-public class Produit {
+import java.io.Serializable;
+
+public class Produit implements Serializable {
     private int id;
     private String designation;
     private double prix;

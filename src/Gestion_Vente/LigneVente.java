@@ -2,8 +2,10 @@ package Gestion_Vente;
 
 import Gestion_Produit.Produit;
 
+import java.io.Serializable;
 
-public class LigneVente {
+
+public class LigneVente implements Serializable {
     
     private int id;
     private Vente vente;

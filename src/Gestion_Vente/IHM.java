@@ -441,8 +441,8 @@ public class IHM extends Application {
                     PDFGenerator pdfGenerator = new PDFGenerator();
                     pdfGenerator.generateBellIntoPdf(listVente, table.getSelectionModel().getSelectedItem());
 //                    System.out.println("imprim ::" + table.getSelectionModel().getSelectedItem().getImprimer());
-//                    dao.updateImprimer(table.getSelectionModel().getSelectedItem().getId(), "oui");
-//                    table.getSelectionModel().getSelectedItem().setImprimer("oui");
+                    dao.updateImprimer(table.getSelectionModel().getSelectedItem().getId(), "oui");
+                    table.getSelectionModel().getSelectedItem().setImprimer("oui");
                     updateListItems();
                     clearFields();
                 } else {

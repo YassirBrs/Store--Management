@@ -5,14 +5,19 @@ import Gestion_Transfert.TransfertDAOIMPL;
 import Gestion_Vente.VenteDAOIMPL;
 
 import java.awt.event.ActionEvent;
+import java.io.ObjectOutputStream;
+import java.io.PrintStream;
+import java.net.Socket;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Scanner;
 
 import UI.Notification;
 import UI.Header;
 import UI.Navbar;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -50,6 +55,7 @@ public class IHM extends Application {
     Button editButton;
     Button deleteButton;
     PaiementDAOIMPL dao;
+    TransfertDAOIMPL daoo;
     Label statusLabel;
     Label resteLabel, resteValueLabel, paidLabel, paidValueLabel, totalValueLabel;
     // Attributs de la table view
@@ -67,9 +73,24 @@ public class IHM extends Application {
     int idVenteFromSales;
 
     Notification warning = new Notification("paiements");
+    Socket client = null;
+
+    MyThread detector;
+    boolean serverState = false;
 
     public IHM(int idVenteFromSales) {
         this.idVenteFromSales = idVenteFromSales;
+        detector = new MyThread();
+        detector.setServerDetected((socket) -> {
+            System.out.println(socket);
+            client = socket;
+            if (socket == null) serverState = false;
+            else serverState = true;
+            Platform.runLater(() -> {
+                setServerState(serverState);
+            });
+        });
+        detector.start();
     }
 
     public void initRest(List<Paiement> paiements) {
@@ -146,6 +167,15 @@ public class IHM extends Application {
             }
         });
         montantTextField.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue,
+                                String newValue) {
+                if (!newValue.matches("\\d*")) {
+                    montantTextField.setText(newValue.replaceAll("[^\\d]", ""));
+                }
+            }
+        });
+        ribTextField.textProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> observable, String oldValue,
                                 String newValue) {
@@ -253,10 +283,6 @@ public class IHM extends Application {
         listOfPaiements.addAll(getPaiementsList());
     }
 
-//    public void updateState() {
-//        boolean enabled = this.typesBox.getSelectionModel().equals("Virement");
-//
-//    }
 
     public void initTable() {
 
@@ -279,6 +305,35 @@ public class IHM extends Application {
 //        this.typesBox.setValue(null);
     }
 
+    public void savePaiement(Paiement p, Transfert t) {
+        dao = new PaiementDAOIMPL();
+        dao.create(p);
+        daoo = new TransfertDAOIMPL();
+        daoo.create(t);
+        clearFields();
+        updateListItems();
+        initRest(paiements);
+    }
+
+    public void sendPaiement(Paiement p, Transfert t) throws Exception {
+        PrintStream ps = new PrintStream(this.client.getOutputStream());
+        ps.println(Double.toString(p.getMontant()));
+        ps.flush();
+        Scanner sc = new Scanner(this.client.getInputStream());
+        String response = sc.nextLine();
+        if (response.equals("ok")) {
+            savePaiement(p, t);
+            ObjectOutputStream objout = new ObjectOutputStream(this.client.getOutputStream());
+            objout.writeObject(p);
+            objout.flush();
+            String msg = sc.nextLine();
+            warning.setType(Alert.AlertType.CONFIRMATION);
+            warning.shows("Transfert a été effectuer.\n" + msg);
+        } else {
+            warning.setType(Alert.AlertType.WARNING);
+            warning.shows("Sold insuffisant !!");
+        }
+    }
 
     @Override
     public void start(Stage primaryStage) {
@@ -286,7 +341,6 @@ public class IHM extends Application {
         initPane();
         initElement(primaryStage);
         initTable();
-//        updateState();
         root.setTop(boxTop);
         root.setLeft(leftBox);
         root.setCenter(centerBox);
@@ -368,17 +422,28 @@ public class IHM extends Application {
                                         p.getVente().getClient().getNom(),
                                         p.getVente().getClient().getPrenom(),
                                         ribTextField.getText(),
-                                        bankLabel.getText(),
+                                        bankTextField.getText(),
                                         Double.parseDouble(montantTextField.getText()),
                                         dateTextField.getValue().format(timeFormatter)
                                 );
-                                TransfertDAOIMPL ddao=new TransfertDAOIMPL();
-                                ddao.create(t);
-                                dao.create(p);
-                                clearFields();
-                                updateListItems();
-                                initRest(paiements);
-                            }else{
+                                if (this.serverState) {
+
+                                    try {
+                                        sendPaiement(p, t);
+                                    } catch (Exception ex) {
+                                        ex.printStackTrace();
+                                    }
+
+                                } else {
+                                    warning.shows("Le serveur de banque est désactivé!!");
+                                }
+//                                TransfertDAOIMPL ddao=new TransfertDAOIMPL();
+//                                ddao.create(t);
+//                                dao.create(p);
+//                                clearFields();
+//                                updateListItems();
+//                                initRest(paiements);
+                            } else {
                                 warning.setType(Alert.AlertType.WARNING);
                                 warning.shows("Veuillez remplir tous les champs");
                             }
@@ -467,6 +532,50 @@ public class IHM extends Application {
         primaryStage.setScene(scene);
 
         primaryStage.show();
+
+    }
+
+    static class MyThread extends Thread {
+        Socket socket = null;
+
+        @Override
+        public void run() {
+            while (true) {
+                try {
+                    sleep(2000);
+                    if (socket != null)
+                        continue;
+                    socket = new Socket("localhost", 1500);
+                    if (serverDetected != null)
+                        serverDetected.onReceive(socket);
+                } catch (Exception e) {
+                    serverDetected.onReceive(null);
+                }
+            }
+        }
+
+        public void setServerDetected(OnServerDetected serverDetected) {
+            this.serverDetected = serverDetected;
+        }
+
+        public Socket getSocket() {
+            return socket;
+        }
+
+        public void setSocket(Socket socket) {
+            this.socket = socket;
+        }
+
+        interface OnServerDetected {
+            void onReceive(Socket socket);
+        }
+
+        OnServerDetected serverDetected;
+    }
+
+    private void setServerState(boolean state) {
+        if (state) System.out.println("Le serveur est activé");
+        else System.out.println("Le serveur est desactivé");
 
     }
 

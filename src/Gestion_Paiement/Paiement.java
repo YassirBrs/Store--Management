@@ -2,7 +2,9 @@ package Gestion_Paiement;
 
 import Gestion_Vente.Vente;
 
-public class Paiement {
+import java.io.Serializable;
+
+public class Paiement implements Serializable {
 
     private int id;
     private Vente vente;
