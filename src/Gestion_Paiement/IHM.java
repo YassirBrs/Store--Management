@@ -374,16 +374,16 @@ public class IHM extends Application {
             statusColumn.setCellFactory(column -> new TableCell<Paiement, String>() {
                 @Override
                 protected void updateItem(String item, boolean empty) {
-                    super.updateItem(item, empty); //This is mandatory
+//                    super.updateItem(item, empty); //This is mandatory
                     if (item == null || empty) { //If the cell is empty
                         setText("");
                     } else if (item.equals("Payer")) {
                         setText(item);
                         TableRow currt = getTableRow();
-                        try {
+//                        try {
                             currt.setStyle("-fx-background-color: lightgreen"); //The background of the cell in yellow
-                        } catch (Exception e) {
-                        }
+//                        } catch (Exception e) {
+//                        }
                     } else if (item.equals("Non Payer")) {
                         setText(item);
                         TableRow currt = getTableRow();
